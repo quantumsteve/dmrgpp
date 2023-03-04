@@ -81,6 +81,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include <vector>
 #include <stdexcept>
 #include "Options.h"
+#include "Geometry/Geometry.h"
 
 namespace LanczosPlusPlus {
 
@@ -100,7 +101,64 @@ public:
 
 	PsimagLite::String import() const
 	{
-		return "";
+		PsimagLite::String str = PsimagLite::Geometry<int,int,ProgramGlobals>::import();
+
+		str += "vector hubbardU;\n";
+		str += "vector potentialV;\n";
+		str += "string! Model;\n";
+		str += "string! SolverOptions;\n";
+		str += "string! Version;\n";
+		str += "integer! InfiniteLoopKeptStates;\n";
+		str += "string! OutputFile;\n";
+		str += "matrix.integer FiniteLoops;\n";
+		str += "integer RepeatFiniteLoopsFrom;\n";
+		str += "integer RepeatFiniteLoopsTimes;\n";
+		str += "integer TargetElectronsUp;\n";
+		str += "integer TargetElectronsDown;\n";
+		str += "integer TargetElectronsTotal;\n";
+		str += "real GsWeight;\n";
+		str += "real TSPTau;\n";
+		str += "integer TSPTimeSteps;\n";
+		str += "integer TSPAdvanceEach;\n";
+		str += "string TSPAlgorithm;\n";
+		str += "vector.integer TSPSites;\n";
+		str += "vector.integer TSPLoops;\n";
+		str += "string TSPProductOrSum;\n";
+		str += "string TSPOperator;\n";
+		str += "string OperatorExpression;\n";
+		str += "integer Threads = 1;\n";
+		str += "integer Orbitals = 1;\n";
+		str += "string FeAsMode;\n";
+		str += "integer TargetSpinTimesTwo;\n";
+		str += "integer UseSu2Symmetry;\n";
+		str += "integer Pvectors;\n";
+		str += "string TruncationTolerance;\n";
+		str += "integer HeisenbergTwiceS;\n";
+		str += "integer TargetSzPlusConst;\n";
+		str += "integer SpinTwiceS;\n";
+		str += "integer OrbitalTwiceS;\n";
+		str += "real LambdaOne;\n";
+		str += "real LambdaTwo;\n";
+		str += "real CorrectionA;\n";
+		str += "string RestartFilename;\n";
+		str += "real LanczosEps;\n";
+		str += "real TridiagonalEps;\n";
+		str += "integer DynamicDmrgType;\n";
+		str += "real CorrectionVectorFreqType;\n";
+		str += "real CorrectionVectorEta;\n";
+		str += "string CorrectionVectorAlgorithm;\n";
+		str += "real CorrectionVectorOmega;\n";
+		str += "string Intent;\n";
+		str += "integer OpOnSiteThreshold;\n";
+		str += "integer FirstRitz;\n";
+		str += "integer CVnForFraction;\n";
+		str += "real AnisotropyD;\n";
+		str += "string FindSymmetrySector;\n";
+		str += "string AddOnSiteHamiltonian;\n";
+		str += "vector MagneticFieldX;\n";
+		str += "vector MagneticFieldZ;\n";
+
+		return str;
 	}
 
 	bool check(const PsimagLite::String& label,
