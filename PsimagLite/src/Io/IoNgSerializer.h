@@ -48,6 +48,7 @@ public:
 		try {
 			hdf5file_ = std::make_unique<H5::H5File>(filename, mode);
 		} catch (H5::Exception& e) {
+			hdf5file_.reset();
 			throw e;
 		}
 
@@ -55,6 +56,7 @@ public:
 			try {
 				createGroup("");
 			} catch (H5::Exception& e) {
+				hdf5file_.reset();
 				filename_.clear();
 				throw e;
 			}
@@ -64,6 +66,7 @@ public:
 			try {
 				readCanary();
 			} catch (H5::Exception& e) {
+				hdf5file_.reset();
 				filename_.clear();
 				throw e;
 			}
