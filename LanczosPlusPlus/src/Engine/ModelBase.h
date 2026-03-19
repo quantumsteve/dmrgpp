@@ -92,14 +92,14 @@ public:
 	                 const VectorType& psi,
 	                 const BasisBaseType& basis) const
 	{
-		static const int FERMION_SIGN = ProgramGlobals::FERMION_SIGN;
+		static const int FERMION_SIGN = LanczosGlobals::FERMION_SIGN;
 
 		std::fill(psiNew.begin(), psiNew.end(), 0.0);
 		const SizeType hilbert = basis.size();
 		const SizeType nops = vops.size();
 		for (SizeType ispace = 0; ispace < hilbert; ++ispace) {
-			WordType ket1 = basis(ispace, ProgramGlobals::SPIN_UP);
-			WordType ket2 = basis(ispace, ProgramGlobals::SPIN_DOWN);
+			WordType ket1 = basis(ispace, LanczosGlobals::SPIN_UP);
+			WordType ket2 = basis(ispace, LanczosGlobals::SPIN_DOWN);
 			assert(ispace < psi.size());
 			ComplexOrRealType value = psi[ispace];
 			WordType ketp1 = ket1;
@@ -112,21 +112,21 @@ public:
 				const SizeType site = vsites[j];
 
 				ComplexOrRealType result = 0;
-				nonZero = (op.dof() == ProgramGlobals::SPIN_UP)
+				nonZero = (op.dof() == LanczosGlobals::SPIN_UP)
 				        ? applyOperator(ketp1, result, op, site)
 				        : applyOperator(ketp2, result, op, site);
 				if (!nonZero) break;
 
 				if (op.isFermionic()) {
-					const SizeType overUp = (op.dof() == ProgramGlobals::SPIN_UP)
+					const SizeType overUp = (op.dof() == LanczosGlobals::SPIN_UP)
 					        ? 0
 					        : PsimagLite::BitManip::count(ketp1);
 
 					if (overUp & 1) result *= FERMION_SIGN;
 
-					const WordType ket1or2 = (op.dof() == ProgramGlobals::SPIN_UP) ? ketp1
+					const WordType ket1or2 = (op.dof() == LanczosGlobals::SPIN_UP) ? ketp1
 					                                                               : ketp2;
-					const ComplexOrRealType fsign = ProgramGlobals::doSign(ket1or2, site);
+					const ComplexOrRealType fsign = LanczosGlobals::doSign(ket1or2, site);
 					result *= fsign;
 				}
 
@@ -168,7 +168,7 @@ private:
 	                          SizeType site)
 	{
 		const WordType ket = ketp;
-		const WordType mask = ProgramGlobals::bitmask(site);
+		const WordType mask = LanczosGlobals::bitmask(site);
 		WordType s = (ket & mask);
 		bool sbit = (s > 0);
 		bool sbitSaved = sbit;

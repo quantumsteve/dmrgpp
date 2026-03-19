@@ -23,7 +23,7 @@ Please see full open source license included in file LICENSE.
 #include "Matrix.h"
 #include "BitManip.h"
 #include <cassert>
-#include "ProgramGlobals.h"
+#include "LanczosGlobals.h"
 #include "LabeledOperator.h"
 
 namespace LanczosPlusPlus {
@@ -32,7 +32,7 @@ namespace LanczosPlusPlus {
 
 	public:
 
-		typedef ProgramGlobals::WordType WordType;
+		typedef LanczosGlobals::WordType WordType;
 		typedef LabeledOperator LabeledOperatorType;
 
 		static SizeType nsite_;
@@ -49,7 +49,7 @@ namespace LanczosPlusPlus {
 
 			nsite_ = orbsPerSite.size();
 			doCombinatorial();
-			ProgramGlobals::doBitmask(nsite_*4 + 1);
+			LanczosGlobals::doBitmask(nsite_*4 + 1);
 
 			/* compute size of basis */
 			if (npart==0) {
@@ -91,9 +91,9 @@ namespace LanczosPlusPlus {
 		void print(std::ostream& os,bool isBinary) const
 		{
 			if (isBinary) {
-				ProgramGlobals::printBasisBinary(os,1,data_);
+				LanczosGlobals::printBasisBinary(os,1,data_);
 			} else {
-				ProgramGlobals::printBasisDecimal(os,40,data_);
+				LanczosGlobals::printBasisDecimal(os,40,data_);
 			}
 		}
 
@@ -130,10 +130,10 @@ namespace LanczosPlusPlus {
 			WordType ketA=0,ketB=0;
 			uncollateKet(ketA,ketB,ket);
 			if (orb==0) {
-				   WordType res = (ketA & ProgramGlobals::bitmask(site));
+				   WordType res = (ketA & LanczosGlobals::bitmask(site));
 				   return (res>0) ? 1 : 0;
 			}
-			WordType res2 = ketB & ProgramGlobals::bitmask(site);
+			WordType res2 = ketB & LanczosGlobals::bitmask(site);
 			return (res2>0) ? 1 : 0;
 		}
 
@@ -156,7 +156,7 @@ namespace LanczosPlusPlus {
 
 		static const WordType& bitmask(SizeType i)
 		{
-			return ProgramGlobals::bitmask(i);
+			return LanczosGlobals::bitmask(i);
 		}
 
 		int doSign(SizeType i,SizeType site,SizeType orb) const
@@ -168,7 +168,7 @@ namespace LanczosPlusPlus {
 			}
 
 			SizeType c = PsimagLite::BitManip::count(ketA);
-			int ret = (c&1) ? ProgramGlobals::FERMION_SIGN : 1;
+			int ret = (c&1) ? LanczosGlobals::FERMION_SIGN : 1;
 			return ret * doSign(ketB,site);
 		}
 
@@ -200,7 +200,7 @@ namespace LanczosPlusPlus {
 			x1 = j*orbs()+orb2;
 			sum += getNbyKet(ket,x0,x1);
 
-			return (sum & 1) ? ProgramGlobals::FERMION_SIGN : 1;
+			return (sum & 1) ? LanczosGlobals::FERMION_SIGN : 1;
 		}
 
 		int doSignGf(WordType a,SizeType ind,SizeType orb) const
@@ -229,7 +229,7 @@ namespace LanczosPlusPlus {
 		SizeType isThereAnElectronAt(SizeType ket,SizeType site,SizeType orb) const
 		{
 			SizeType x = site*orbs() + orb;
-			return (ket & ProgramGlobals::bitmask(x)) ? 1 : 0;
+			return (ket & LanczosGlobals::bitmask(x)) ? 1 : 0;
 		}
 
 		SizeType electrons() const { return npart_; }
@@ -274,17 +274,17 @@ namespace LanczosPlusPlus {
 		            SizeType i) const
 		{
 
-			WordType si=(ket & ProgramGlobals::bitmask(i));
+			WordType si=(ket & LanczosGlobals::bitmask(i));
 			if (lOperator.id() == LabeledOperatorType::Label::OPERATOR_C) {
 				if (si>0) {
-					bra = (ket ^ ProgramGlobals::bitmask(i));
+					bra = (ket ^ LanczosGlobals::bitmask(i));
 					return true;
 				} else {
 					return false; // cannot destroy, there's nothing
 				}
 			} else if (lOperator.id() == LabeledOperatorType::Label::OPERATOR_CDAGGER) {
 				if (si==0) {
-					bra = (ket ^ ProgramGlobals::bitmask(i));
+					bra = (ket ^ LanczosGlobals::bitmask(i));
 					return true;
 				} else {
 					return false; // cannot construct, there's already one
@@ -311,7 +311,7 @@ namespace LanczosPlusPlus {
 			mask &= ((1 << (i+1)) - 1) ^ ((1 << j) - 1);
 			int s=(PsimagLite::BitManip::count(mask) & 1) ? -1 : 1; // Parity of up between i and j
 			// Is there a down at i?
-			if (ProgramGlobals::bitmask(i) & b) s = -s;
+			if (LanczosGlobals::bitmask(i) & b) s = -s;
 			return s;
 		}
 
@@ -415,8 +415,8 @@ namespace LanczosPlusPlus {
 			while(remA || remB) {
 				SizeType bitA = (remA & 1);
 				SizeType bitB = (remB & 1);
-				if (bitA) ket |= ProgramGlobals::bitmask(counter);
-				if (bitB)  ket |= ProgramGlobals::bitmask(counter + 1);
+				if (bitA) ket |= LanczosGlobals::bitmask(counter);
+				if (bitB)  ket |= LanczosGlobals::bitmask(counter + 1);
 				counter += 2;
 				if (remA) remA >>= 1;
 				if (remB) remB >>= 1;
@@ -431,8 +431,8 @@ namespace LanczosPlusPlus {
 			while(ket) {
 				SizeType bitA = (ket & 1);
 				SizeType bitB = (ket & 2);
-				if (bitA) ketA |= ProgramGlobals::bitmask(counter);
-				if (bitB) ketB |= ProgramGlobals::bitmask(counter);
+				if (bitA) ketA |= LanczosGlobals::bitmask(counter);
+				if (bitB) ketB |= LanczosGlobals::bitmask(counter);
 				counter++;
 				ket >>= 2;
 			}
@@ -444,7 +444,7 @@ namespace LanczosPlusPlus {
 
 			a &= ((1 << (i+1)) - 1) ^ ((1 << nsite_) - 1);
 			// Parity of single occupied between i and nsite-1
-			int s=(PsimagLite::BitManip::count(a) & 1) ? ProgramGlobals::FERMION_SIGN : 1;
+			int s=(PsimagLite::BitManip::count(a) & 1) ? LanczosGlobals::FERMION_SIGN : 1;
 			return s;
 		}
 
@@ -453,7 +453,7 @@ namespace LanczosPlusPlus {
 			SizeType sum = 0;
 			SizeType counter = from;
 			while(counter<upto) {
-				if (ket & ProgramGlobals::bitmask(counter)) sum++;
+				if (ket & LanczosGlobals::bitmask(counter)) sum++;
 				counter++;
 			}
 			return sum;

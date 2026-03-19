@@ -41,7 +41,7 @@ class FeBasedSc : public ModelBase<ComplexOrRealType,
 	typedef ModelBase<ComplexOrRealType,GeometryType,InputType> BaseType;
 	typedef PsimagLite::GeometryDca<RealType,GeometryType> GeometryDcaType;
 
-	enum {SPIN_UP = ProgramGlobals::SPIN_UP, SPIN_DOWN = ProgramGlobals::SPIN_DOWN};
+	enum {SPIN_UP = LanczosGlobals::SPIN_UP, SPIN_DOWN = LanczosGlobals::SPIN_DOWN};
 
 	typedef ParametersModelFeAs<ComplexOrRealType> ParametersModelType;
 	typedef typename BasisType::BaseType BasisBaseType;
@@ -351,7 +351,7 @@ private:
 					if (s1i == 0) h = PsimagLite::conj(h);
 					WordType bra1= ket1 ^(BasisType::bitmask(ii)|BasisType::bitmask(jj));
 					SizeType temp = basis.perfectIndex(bra1,ket2);
-					RealType extraSign = (s1i==1) ? ProgramGlobals::FERMION_SIGN : 1;
+					RealType extraSign = (s1i==1) ? LanczosGlobals::FERMION_SIGN : 1;
 					RealType tmp2 = basis_.doSign(ket1,ket2,i,orb,j,orb2,SPIN_UP);
 					ComplexOrRealType cTemp = h*extraSign*tmp2;
 					sparseRow.add(temp,cTemp);
@@ -362,7 +362,7 @@ private:
 					if (s2i == 0) h = PsimagLite::conj(h);
 					WordType bra2= ket2 ^(BasisType::bitmask(ii)|BasisType::bitmask(jj));
 					SizeType temp = basis.perfectIndex(ket1,bra2);
-					RealType extraSign = (s2i==1) ? ProgramGlobals::FERMION_SIGN : 1;
+					RealType extraSign = (s2i==1) ? LanczosGlobals::FERMION_SIGN : 1;
 					RealType tmp2 = basis_.doSign(ket1,ket2,i,orb,j,orb2,SPIN_DOWN);
 					ComplexOrRealType cTemp = h*extraSign*tmp2;
 					sparseRow.add(temp,cTemp);
@@ -426,7 +426,7 @@ private:
 		WordType bra2 = ket2 ^ (BasisType::bitmask(ii)|BasisType::bitmask(jj));
 		SizeType temp = basis.perfectIndex(bra1,bra2);
 		RealType sign = jTermSign(ket1,ket2,i,orb1,i,orb2,basis);
-		sparseRow.add(temp,ProgramGlobals::FERMION_SIGN*mp_.hubbardU[3]*sign);
+		sparseRow.add(temp,LanczosGlobals::FERMION_SIGN*mp_.hubbardU[3]*sign);
 	}
 
 	void setSpinOrbitOffDiagonal(SparseRowType &sparseRow,

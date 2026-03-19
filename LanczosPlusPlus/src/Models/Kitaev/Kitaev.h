@@ -23,7 +23,7 @@ class Kitaev  : public ModelBase<ComplexOrRealType,GeometryType,InputType> {
 	typedef ModelBase<ComplexOrRealType,GeometryType,InputType> BaseType;
 	typedef typename PsimagLite::Vector<RealType>::Type VectorRealType;
 
-	enum {SPIN_UP = ProgramGlobals::SPIN_UP, SPIN_DOWN = ProgramGlobals::SPIN_DOWN};
+	enum {SPIN_UP = LanczosGlobals::SPIN_UP, SPIN_DOWN = LanczosGlobals::SPIN_DOWN};
 
 public:
 
@@ -131,11 +131,11 @@ public:
 	                 SizeType orb) const
 	{
 		throw PsimagLite::RuntimeError("Kitaev::hasNewParts() unimplemented yet\n");
-		//		if (what==ProgramGlobals::OPERATOR_SZ)
+		//		if (what==LanczosGlobals::OPERATOR_SZ)
 		//			return false;
 
-		//		if (what == ProgramGlobals::OPERATOR_SPLUS ||
-		//		        what == ProgramGlobals::OPERATOR_SMINUS)
+		//		if (what == LanczosGlobals::OPERATOR_SPLUS ||
+		//		        what == LanczosGlobals::OPERATOR_SMINUS)
 		//			return hasNewPartsSplusOrMinus(newParts,oldParts,what,spin);
 
 		PsimagLite::String str(__FILE__);

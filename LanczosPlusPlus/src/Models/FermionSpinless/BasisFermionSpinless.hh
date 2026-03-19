@@ -13,7 +13,7 @@ class BasisFermionSpinless : public BasisBase<GeometryType> {
 
 public:
 
-	typedef ProgramGlobals::PairIntType PairIntType;
+	typedef LanczosGlobals::PairIntType PairIntType;
 	typedef BasisOneSpin BasisType;
 	typedef BasisBase<GeometryType> BaseType;
 	typedef typename BaseType::WordType WordType;

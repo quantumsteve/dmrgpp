@@ -1,5 +1,5 @@
-#include "ProgramGlobals.h"
-#include "Engine/ProgramGlobals.h"
+#include "LanczosGlobals.h"
+#include "Engine/LanczosGlobals.h"
 
 namespace LanczosPlusPlus {
 

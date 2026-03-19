@@ -28,10 +28,10 @@ namespace LanczosPlusPlus {
 template<typename GeometryType_>
 class BasisFeAsBasedSc : public BasisBase<GeometryType_> {
 
-	typedef ProgramGlobals::PairIntType PairIntType;
+	typedef LanczosGlobals::PairIntType PairIntType;
 
 	static SizeType orbitals_;
-	static const SizeType SPIN_UP = ProgramGlobals::SPIN_UP;
+	static const SizeType SPIN_UP = LanczosGlobals::SPIN_UP;
 
 public:
 

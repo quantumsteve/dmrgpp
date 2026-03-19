@@ -19,94 +19,88 @@ PsimagLite::String license = "Copyright (c) 2009-2012, UT-Battelle, LLC\n"
 using namespace LanczosPlusPlus;
 
 void fillOrbsOrSpin(PsimagLite::Vector<LanczosPlusPlus::LanczosOptions::PairSizeType>::Type& spinV,
-                    const PsimagLite::Vector<PsimagLite::String>::Type& strV)
+                    const PsimagLite::Vector<PsimagLite::String>::Type&                      strV)
 {
-	for (SizeType i=0;i<strV.size();i++) {
+	for (SizeType i = 0; i < strV.size(); i++) {
 		PsimagLite::Vector<PsimagLite::String>::Type strV2;
 		PsimagLite::split(strV2, strV[i], ",");
-		if (strV2.size()!=2)
+		if (strV2.size() != 2)
 			throw std::runtime_error("-o needs pairs\n");
 		LanczosPlusPlus::LanczosOptions::PairSizeType spins;
-		spins.first = atoi(strV2[0].c_str());
+		spins.first  = atoi(strV2[0].c_str());
 		spins.second = atoi(strV2[1].c_str());
 		spinV.push_back(spins);
 	}
 }
 
-template<typename ModelType>
-void mainLoop(InputNgType::Readable& io,
-              const ModelType& model,
+template <typename ModelType>
+void mainLoop(InputNgType::Readable&           io,
+              const ModelType&                 model,
               LanczosPlusPlus::LanczosOptions& lanczosOptions)
 {
-	typedef typename ModelType::GeometryType GeometryType;
+	typedef typename ModelType::GeometryType  GeometryType;
 	typedef typename ModelType::BasisBaseType BasisBaseType;
 
 	int tmp = 0;
 	try {
-		io.readline(tmp,"UseTranslationSymmetry=");
-	} catch(std::exception& e) {}
+		io.readline(tmp, "UseTranslationSymmetry=");
+	} catch (std::exception& e) { }
 
-	bool useTranslationSymmetry = (tmp==1) ? true : false;
+	bool useTranslationSymmetry = (tmp == 1) ? true : false;
 
 	try {
-		io.readline(tmp,"UseReflectionSymmetry=");
-	} catch(std::exception& e) {}
+		io.readline(tmp, "UseReflectionSymmetry=");
+	} catch (std::exception& e) { }
 
-	bool useReflectionSymmetry = (tmp==1) ? true : false;
+	bool useReflectionSymmetry = (tmp == 1) ? true : false;
 
 	if (useTranslationSymmetry) {
 		mainLoop2<ModelType,
-		        LanczosPlusPlus::TranslationSymmetry<GeometryType,BasisBaseType> >(model,
-		                                                                           io,
-		                                                                           lanczosOptions);
+		          LanczosPlusPlus::TranslationSymmetry<GeometryType, BasisBaseType>>(
+		    model, io, lanczosOptions);
 	} else if (useReflectionSymmetry) {
 		mainLoop2<ModelType,
-		        LanczosPlusPlus::ReflectionSymmetry<GeometryType,BasisBaseType> >(model,
-		                                                                          io,
-		                                                                          lanczosOptions);
+		          LanczosPlusPlus::ReflectionSymmetry<GeometryType, BasisBaseType>>(
+		    model, io, lanczosOptions);
 	} else {
-		mainLoop2<ModelType,
-		        LanczosPlusPlus::DefaultSymmetry<GeometryType,BasisBaseType> >(model,
-		                                                                       io,
-		                                                                       lanczosOptions);
+		mainLoop2<ModelType, LanczosPlusPlus::DefaultSymmetry<GeometryType, BasisBaseType>>(
+		    model, io, lanczosOptions);
 	}
 }
 
-template<typename ComplexOrRealType>
-void mainLoop0(InputNgType::Readable& io,
-               LanczosPlusPlus::LanczosOptions& lanczosOptions)
+template <typename ComplexOrRealType>
+void mainLoop0(InputNgType::Readable& io, LanczosPlusPlus::LanczosOptions& lanczosOptions)
 {
-	typedef PsimagLite::Geometry<ComplexOrRealType,
-	        InputNgType::Readable,
-	        LanczosPlusPlus::ProgramGlobals> GeometryType;
-	typedef LanczosPlusPlus::ModelSelector<ComplexOrRealType,
-	        GeometryType,
-	        InputNgType::Readable> ModelSelectorType;
+	typedef PsimagLite::
+	    Geometry<ComplexOrRealType, InputNgType::Readable, LanczosPlusPlus::LanczosGlobals>
+	        GeometryType;
+	typedef LanczosPlusPlus::
+	    ModelSelector<ComplexOrRealType, GeometryType, InputNgType::Readable>
+	                                                  ModelSelectorType;
 	typedef typename ModelSelectorType::ModelBaseType ModelBaseType;
-
 
 	GeometryType geometry(io);
 
-	std::cout<<geometry;
+	std::cout << geometry;
 
-	ModelSelectorType modelSelector(io,geometry);
+	ModelSelectorType    modelSelector(io, geometry);
 	const ModelBaseType& modelPtr = modelSelector();
 
-	std::cout<<modelPtr;
-	mainLoop(io,modelPtr,lanczosOptions);
+	std::cout << modelPtr;
+	mainLoop(io, modelPtr, lanczosOptions);
 }
 
-int main(int argc,char **argv)
+int main(int argc, char** argv)
 {
-	PsimagLite::PsiApp application("lanczos++",&argc,&argv,1);
-	int opt = 0;
-	LanczosOptions lanczosOptions;
-	PsimagLite::String file = "";
+	PsimagLite::PsiApp                           application("lanczos++", &argc, &argv, 1);
+	int                                          opt = 0;
+	LanczosOptions                               lanczosOptions;
+	PsimagLite::String                           file = "";
 	PsimagLite::Vector<PsimagLite::String>::Type str;
-	InputCheck inputCheck;
-	int precision = 6;
-	bool versionOnly = false;
-	SizeType threadsInCmdLine = 0;
+	InputCheck                                   inputCheck;
+	int                                          precision        = 6;
+	bool                                         versionOnly      = false;
+	SizeType                                     threadsInCmdLine = 0;
 
 	/* PSIDOC LanczosDriver
 	\begin{itemize}
@@ -147,7 +141,7 @@ int main(int argc,char **argv)
 		case 's':
 			lanczosOptions.spins.clear();
 			PsimagLite::split(str, optarg, ";");
-			fillOrbsOrSpin(lanczosOptions.spins,str);
+			fillOrbsOrSpin(lanczosOptions.spins, str);
 			str.clear();
 			break;
 		case 'r':
@@ -180,29 +174,30 @@ int main(int argc,char **argv)
 
 	// print license
 	if (ConcurrencyType::root()) {
-		std::cerr<<license;
-		std::cerr<<"Lanczos++ Version "<<LANCZOSPP_VERSION<<"\n";
-		std::cerr<<"PsimagLite version "<<PSIMAGLITE_VERSION<<"\n";
+		std::cerr << license;
+		std::cerr << "Lanczos++ Version " << LANCZOSPP_VERSION << "\n";
+		std::cerr << "PsimagLite version " << PSIMAGLITE_VERSION << "\n";
 	}
 
-	if (versionOnly) return 0;
+	if (versionOnly)
+		return 0;
 
-	//Setup the Geometry
-	InputNgType::Writeable ioWriteable(file,inputCheck);
-	InputNgType::Readable io(ioWriteable);
+	// Setup the Geometry
+	InputNgType::Writeable ioWriteable(file, inputCheck);
+	InputNgType::Readable  io(ioWriteable);
 
-	bool isComplex = false;
+	bool isComplex     = false;
 	bool setAffinities = false;
 
 	PsimagLite::String solverOptions;
-	io.readline(solverOptions,"SolverOptions=");
+	io.readline(solverOptions, "SolverOptions=");
 	try {
 		int fermionSign = -1;
 		io.readline(fermionSign, "FermionSign=");
-		std::cerr<<"WARNING= FermionSign="<<fermionSign<<"\n";
-		std::cout<<"WARNING= FermionSign="<<fermionSign<<"\n";
-		LanczosPlusPlus::ProgramGlobals::FERMION_SIGN=fermionSign;
-	} catch (std::exception&) {}
+		std::cerr << "WARNING= FermionSign=" << fermionSign << "\n";
+		std::cout << "WARNING= FermionSign=" << fermionSign << "\n";
+		LanczosPlusPlus::LanczosGlobals::FERMION_SIGN = fermionSign;
+	} catch (std::exception&) { }
 
 	PsimagLite::Vector<PsimagLite::String>::Type tokens;
 	PsimagLite::split(tokens, solverOptions, ",");
@@ -217,8 +212,8 @@ int main(int argc,char **argv)
 	//! setup distributed parallelization
 	SizeType npthreads = 1;
 	try {
-		io.readline(npthreads,"Threads=");
-	} catch (std::exception&) {}
+		io.readline(npthreads, "Threads=");
+	} catch (std::exception&) { }
 
 	if (threadsInCmdLine > 0)
 		npthreads = threadsInCmdLine;
@@ -229,7 +224,7 @@ int main(int argc,char **argv)
 	typedef std::complex<RealType> ComplexType;
 
 	if (isComplex)
-		mainLoop0<ComplexType>(io,lanczosOptions);
+		mainLoop0<ComplexType>(io, lanczosOptions);
 	else
-		mainLoop0<RealType>(io,lanczosOptions);
+		mainLoop0<RealType>(io, lanczosOptions);
 }

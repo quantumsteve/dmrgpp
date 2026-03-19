@@ -72,7 +72,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 /** \ingroup LanczosPlusPlus */
 /*@{*/
 
-/*! \file ProgramGlobals.h
+/*! \file LanczosGlobals.h
  *
  *
  *
@@ -95,12 +95,12 @@ std::ostream& operator<<(std::ostream& os, const std::pair<T1, T2>& p)
 	return os;
 }
 
-struct ProgramGlobals {
+struct LanczosGlobals {
 
 	typedef std::pair<int, int> PairIntType;
 	typedef unsigned int long   WordType;
 
-	static int FERMION_SIGN = 1;
+	static int FERMION_SIGN;
 
 	enum
 	{
@@ -231,7 +231,7 @@ struct ProgramGlobals {
 private:
 
 	static PsimagLite::Vector<WordType>::Type bitmask_;
-}; // ProgramGlobals
+}; // LanczosGlobals
 
 } // namespace LanczosPlusPlus
 /*@}*/

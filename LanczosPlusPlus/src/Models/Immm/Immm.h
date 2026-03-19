@@ -34,7 +34,7 @@ class Immm : public ModelBase<ComplexOrRealType,GeometryType,InputType> {
 	typedef PsimagLite::Matrix<ComplexOrRealType> MatrixType;
 	typedef ModelBase<ComplexOrRealType,GeometryType,InputType> BaseType;
 
-	enum {SPIN_UP = ProgramGlobals::SPIN_UP, SPIN_DOWN = ProgramGlobals::SPIN_DOWN};
+	enum {SPIN_UP = LanczosGlobals::SPIN_UP, SPIN_DOWN = LanczosGlobals::SPIN_DOWN};
 
 public:
 
@@ -209,7 +209,7 @@ private:
 				if (s1i+s1j==1) {
 					WordType bra1= ket1 ^(BasisType::bitmask(ii)|BasisType::bitmask(jj));
 					SizeType temp = basis.perfectIndex(bra1,ispace,SPIN_UP);
-					RealType extraSign = (s1i==1) ? ProgramGlobals::FERMION_SIGN : 1;
+					RealType extraSign = (s1i==1) ? LanczosGlobals::FERMION_SIGN : 1;
 					RealType tmp2 = basis.doSign(ket1,ket2,i,orb,j,orb2,SPIN_UP);
 					ComplexOrRealType cTemp = h*extraSign*tmp2;
 					sparseRow.add(temp,cTemp);
@@ -218,7 +218,7 @@ private:
 				if (s2i+s2j==1) {
 					WordType bra2= ket2 ^(BasisType::bitmask(ii)|BasisType::bitmask(jj));
 					SizeType temp = basis.perfectIndex(bra2,ispace,SPIN_DOWN);
-					RealType extraSign = (s2i==1) ? ProgramGlobals::FERMION_SIGN : 1;
+					RealType extraSign = (s2i==1) ? LanczosGlobals::FERMION_SIGN : 1;
 					RealType tmp2 = basis.doSign(ket1,ket2,i,orb,j,orb2,SPIN_DOWN);
 					ComplexOrRealType cTemp = h*extraSign*tmp2;
 					sparseRow.add(temp,cTemp);

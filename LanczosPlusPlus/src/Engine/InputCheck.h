@@ -78,10 +78,10 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
  */
 #ifndef INPUT_CHECK_H
 #define INPUT_CHECK_H
-#include <vector>
-#include <stdexcept>
-#include "Options.h"
 #include "Geometry/Geometry.h"
+#include "Options.h"
+#include <stdexcept>
+#include <vector>
 
 namespace LanczosPlusPlus {
 
@@ -91,17 +91,19 @@ class InputCheck {
 
 public:
 
-	InputCheck() : optsReadable_(0) {}
+	InputCheck()
+	    : optsReadable_(0)
+	{ }
 
 	~InputCheck()
 	{
-		if (optsReadable_!=0) delete optsReadable_;
+		if (optsReadable_ != 0)
+			delete optsReadable_;
 	}
-
 
 	PsimagLite::String import() const
 	{
-		PsimagLite::String str = PsimagLite::Geometry<int,int,ProgramGlobals>::import();
+		PsimagLite::String str = PsimagLite::Geometry<int, int, LanczosGlobals>::import();
 
 		str += "vector hubbardU;\n";
 		str += "vector potentialV;\n";
@@ -161,49 +163,51 @@ public:
 		return str;
 	}
 
-	bool check(const PsimagLite::String& label,
+	bool check(const PsimagLite::String&                           label,
 	           const PsimagLite::Vector<PsimagLite::String>::Type& vec,
-	           SizeType line) const
+	           SizeType                                            line) const
 	{
-		if (label=="JMVALUES") {
-			if (vec.size()!=2) return error1("JMVALUES",line);
+		if (label == "JMVALUES") {
+			if (vec.size() != 2)
+				return error1("JMVALUES", line);
 			return true;
-		} else if (label=="RAW_MATRIX" || label=="SpinOrbit") {
+		} else if (label == "RAW_MATRIX" || label == "SpinOrbit") {
 			SizeType row = atoi(vec[0].c_str());
 			SizeType col = atoi(vec[1].c_str());
-			SizeType n = row*col;
-			if (vec.size()!=n+2) return error1("RAW_MATRIX",line);
+			SizeType n   = row * col;
+			if (vec.size() != n + 2)
+				return error1("RAW_MATRIX", line);
 			return true;
-		} else if (label=="Connectors") {
+		} else if (label == "Connectors") {
 			return true;
-		} else if (label=="MagneticField") {
+		} else if (label == "MagneticField") {
 			return true;
-		} else if (label=="FiniteLoops") {
+		} else if (label == "FiniteLoops") {
 			SizeType n = atoi(vec[0].c_str());
-			if (vec.size()!=3*n+1)  return error1("FiniteLoops",line);
+			if (vec.size() != 3 * n + 1)
+				return error1("FiniteLoops", line);
 			return true;
 		}
 		return false;
 	}
 
-	bool checkSimpleLabel(const PsimagLite::String& label,
-	                      SizeType line) const
+	bool checkSimpleLabel(const PsimagLite::String& label, SizeType line) const
 	{
 		// FIXME: needs implementation
 		return true;
 	}
 
-	void check(const PsimagLite::String& label,
-	           const PsimagLite::String& val,
-	           SizeType)
+	void check(const PsimagLite::String& label, const PsimagLite::String& val, SizeType)
 	{
-		if (label!="SolverOptions") return;
+		if (label != "SolverOptions")
+			return;
 		PsimagLite::Vector<PsimagLite::String>::Type registerOpts;
 
 		/* PSIDOC LanczosSolverOptions
 		\begin{itemize}
 		\item[none] Use this as a placeholder. ``none'' does not disable other options.
-		\item[InternalProductStored] Stored the sparse matrix in memory before diagonalizing it.
+		\item[InternalProductStored] Stored the sparse matrix in memory before diagonalizing
+		it.
 		\item[InternalProductOnTheFly] Compute the sparse matrix on-the-fly while
 		diagonalizing it.
 		\item[printmatrix] Print the Hamiltonian matrix.
@@ -219,9 +223,9 @@ public:
 		registerOpts.push_back("dumpmatrix");
 		registerOpts.push_back("setAffinities");
 
-		PsimagLite::Options::Writeable optWriteable(registerOpts,
-		                                            PsimagLite::Options::Writeable::PERMISSIVE);
-		optsReadable_ = new  OptionsReadableType(optWriteable,val);
+		PsimagLite::Options::Writeable optWriteable(
+		    registerOpts, PsimagLite::Options::Writeable::PERMISSIVE);
+		optsReadable_ = new OptionsReadableType(optWriteable, val);
 	}
 
 	bool isSet(const PsimagLite::String& thisOption) const
@@ -229,19 +233,18 @@ public:
 		return optsReadable_->isSet(thisOption);
 	}
 
-	void usage(const char *progName)
+	void usage(const char* progName)
 	{
-		std::cerr<<"Usage: "<<progName<<" [-g -c] -f filename\n";
+		std::cerr << "Usage: " << progName << " [-g -c] -f filename\n";
 	}
 
 private:
 
-	bool error1(const PsimagLite::String& message,SizeType line) const
+	bool error1(const PsimagLite::String& message, SizeType line) const
 	{
 		PsimagLite::String s(__FILE__);
 		s += " : Input error for label " + message + " near line " + ttos(line) + "\n";
 		throw PsimagLite::RuntimeError(s.c_str());
-
 	}
 
 	OptionsReadableType* optsReadable_;
@@ -251,4 +254,3 @@ private:
 
 /*@}*/
 #endif
-

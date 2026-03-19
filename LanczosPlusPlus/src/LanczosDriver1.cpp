@@ -2,7 +2,7 @@
 
 typedef PsimagLite::Geometry<RealType,
         InputNgType::Readable,
-        LanczosPlusPlus::ProgramGlobals> Geometry1Type;
+        LanczosPlusPlus::LanczosGlobals> Geometry1Type;
 
 typedef LanczosPlusPlus::ModelSelector<RealType,
         Geometry1Type,

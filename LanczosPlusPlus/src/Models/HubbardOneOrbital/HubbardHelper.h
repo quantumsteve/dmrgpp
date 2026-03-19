@@ -2,7 +2,7 @@
 #define HUBBARDHELPER_H
 #include "CrsMatrix.h"
 #include "SparseRow.h"
-#include "ProgramGlobals.h"
+#include "LanczosGlobals.h"
 #include "Parallelizer2.h"
 
 namespace LanczosPlusPlus {
@@ -25,7 +25,7 @@ public:
 	typedef typename ModelBaseType::RahulOperatorType RahulOperatorType;
 	typedef typename ModelBaseType::VectorRahulOperatorType VectorRahulOperatorType;
 
-	enum {SPIN_UP = ProgramGlobals::SPIN_UP, SPIN_DOWN = ProgramGlobals::SPIN_DOWN};
+	enum {SPIN_UP = LanczosGlobals::SPIN_UP, SPIN_DOWN = LanczosGlobals::SPIN_DOWN};
 
 	enum TermEnum {HOPPING = 0, NINJ = 1, SUPER = 2};
 
@@ -212,13 +212,13 @@ private:
 			if (hasHop && s1i == 1 && s1j == 0) {
 				// apply i
 				WordType bra1 = ket1 ^ BasisType::bitmask(i);
-				RealType tmp2 = ProgramGlobals::doSign(ket1, i)*ProgramGlobals::doSign(bra1, j);
+				RealType tmp2 = LanczosGlobals::doSign(ket1, i)*LanczosGlobals::doSign(bra1, j);
 
 				// apply j
 				bra1 = bra1 ^ BasisType::bitmask(j);
 
 				SizeType temp = basis.perfectIndex(bra1, ket2);
-				//RealType extraSign = (s1j == 1) ? ProgramGlobals::FERMION_SIGN : 1;
+				//RealType extraSign = (s1j == 1) ? LanczosGlobals::FERMION_SIGN : 1;
 				ComplexOrRealType cTemp = h*tmp2; //*extraSign;
 				//if (s1j == 1) cTemp = PsimagLite::conj(cTemp);
 				assert(temp<basis.size());
@@ -228,12 +228,12 @@ private:
 			// Apply c^\dagger_j c_i DOWN
 			if (hasHop && s2i == 1 && s2j == 0) {
 				WordType bra2 = ket2 ^ BasisType::bitmask(i);
-				RealType tmp2 = ProgramGlobals::doSign(ket2, i)*ProgramGlobals::doSign(bra2, j);
+				RealType tmp2 = LanczosGlobals::doSign(ket2, i)*LanczosGlobals::doSign(bra2, j);
 
 				bra2 = bra2 ^ BasisType::bitmask(j);
 
 				SizeType temp = basis.perfectIndex(ket1, bra2);
-				//RealType extraSign = (s2j == 1) ? ProgramGlobals::FERMION_SIGN : 1;
+				//RealType extraSign = (s2j == 1) ? LanczosGlobals::FERMION_SIGN : 1;
 				ComplexOrRealType cTemp = h*tmp2; //*extraSign;
 				//if (s2j == 1) cTemp = PsimagLite::conj(cTemp);
 				assert(temp<basis.size());
@@ -250,10 +250,10 @@ private:
 				WordType bra1 = ket1 ^ (BasisType::bitmask(j));
 				WordType bra2 = ket2 ^ (BasisType::bitmask(i));
 				SizeType temp = basis.perfectIndex(bra1, bra2);
-				//RealType extraSign = (s2j == 0) ? ProgramGlobals::FERMION_SIGN : 1;
-				RealType tmp2 = ProgramGlobals::doSign(ket1, j)*ProgramGlobals::doSign(ket2, i);
+				//RealType extraSign = (s2j == 0) ? LanczosGlobals::FERMION_SIGN : 1;
+				RealType tmp2 = LanczosGlobals::doSign(ket1, j)*LanczosGlobals::doSign(ket2, i);
 				const SizeType count1 = PsimagLite::BitManip::count(ket1); // + s1i;
-				if (count1 & 1) tmp2 *= ProgramGlobals::FERMION_SIGN;
+				if (count1 & 1) tmp2 *= LanczosGlobals::FERMION_SIGN;
 				ComplexOrRealType cTemp = hr*tmp2; //*extraSign;
 				//if (s1i == 1) cTemp = PsimagLite::conj(rashbaHoppings_(j, i));
 				assert(temp<basis.size());
@@ -265,10 +265,10 @@ private:
 				WordType bra1 = ket1 ^ (BasisType::bitmask(i));
 				WordType bra2 = ket2 ^(BasisType::bitmask(j));
 				SizeType temp = basis.perfectIndex(bra1, bra2);
-				//RealType extraSign = (s2i == 0) ? ProgramGlobals::FERMION_SIGN : 1;
-				RealType tmp2 = ProgramGlobals::doSign(ket1, i)*ProgramGlobals::doSign(ket2, j);
+				//RealType extraSign = (s2i == 0) ? LanczosGlobals::FERMION_SIGN : 1;
+				RealType tmp2 = LanczosGlobals::doSign(ket1, i)*LanczosGlobals::doSign(ket2, j);
 				const SizeType count1 = PsimagLite::BitManip::count(ket1); // + s1j;
-				if (count1 & 1) tmp2 *= ProgramGlobals::FERMION_SIGN;
+				if (count1 & 1) tmp2 *= LanczosGlobals::FERMION_SIGN;
 				ComplexOrRealType cTemp = PsimagLite::conj(hr)*tmp2; //*extraSign;
 				//if (s1j == 1) cTemp = PsimagLite::conj(rashbaHoppings_(j, i));
 				assert(temp<basis.size());

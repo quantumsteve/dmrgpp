@@ -23,7 +23,7 @@ Please see full open source license included in file LICENSE.
 #include "Matrix.h"
 #include "BitManip.h"
 #include "../../Engine/Partitions.h"
-#include "../../Engine/ProgramGlobals.h"
+#include "../../Engine/LanczosGlobals.h"
 #include "LabeledOperator.h"
 
 namespace LanczosPlusPlus {
@@ -34,7 +34,7 @@ class BasisOneSpinFeAs {
 
 public:
 
-	typedef ProgramGlobals::WordType WordType;
+	typedef LanczosGlobals::WordType WordType;
 	typedef LabeledOperator LabeledOperatorType;
 
 	static SizeType orbitals_;
@@ -49,7 +49,7 @@ public:
 		orbitals_=orbitals;
 		nsite_ = nsite;
 		doCombinatorial();
-		ProgramGlobals::doBitmask(nsite_*orbitals_*orbitals_+1);
+		LanczosGlobals::doBitmask(nsite_*orbitals_*orbitals_+1);
 
 		/* compute size of basis */
 		if (npart==0) {
@@ -104,7 +104,7 @@ public:
 		PsimagLite::Vector<WordType>::Type kets(orbitals_,0);
 		uncollateKet(kets,ket);
 
-		WordType res = (kets[orb] & ProgramGlobals::bitmask(site));
+		WordType res = (kets[orb] & LanczosGlobals::bitmask(site));
 		return (res>0) ? 1 : 0;
 	}
 
@@ -143,7 +143,7 @@ public:
 
 	static const WordType& bitmask(SizeType i)
 	{
-		return ProgramGlobals::bitmask(i);
+		return LanczosGlobals::bitmask(i);
 	}
 
 	int doSign(WordType ket,
@@ -176,7 +176,7 @@ public:
 		x1 = j*orbitals_+orb2;
 		sum += getNbyKet(ket,x0,x1);
 
-		return (sum & 1) ? ProgramGlobals::FERMION_SIGN : 1;
+		return (sum & 1) ? LanczosGlobals::FERMION_SIGN : 1;
 	}
 
 	SizeType getNbyKet(SizeType ket) const
@@ -194,7 +194,7 @@ public:
 	SizeType isThereAnElectronAt(SizeType ket,SizeType site,SizeType orb) const
 	{
 		SizeType x = site*orbitals_ + orb;
-		return (ket & ProgramGlobals::bitmask(x)) ? 1 : 0;
+		return (ket & LanczosGlobals::bitmask(x)) ? 1 : 0;
 	}
 
 	SizeType electrons() const
@@ -234,7 +234,7 @@ public:
 		x1 = ind*orbitals_+orb;
 		sum += getNbyKet(a,x0,x1);
 
-		return (sum & 1) ? ProgramGlobals::FERMION_SIGN : 1;
+		return (sum & 1) ? LanczosGlobals::FERMION_SIGN : 1;
 	}
 
 	void print(std::ostream& os, bool isBinary) const
@@ -242,9 +242,9 @@ public:
 		SizeType hilbert = 1;
 		hilbert <<= (orbitals_*nsite_);
 		if (isBinary) {
-			ProgramGlobals::printBasisBinary(os,hilbert,data_);
+			LanczosGlobals::printBasisBinary(os,hilbert,data_);
 		} else {
-			ProgramGlobals::printBasisDecimal(os,40,data_);
+			LanczosGlobals::printBasisDecimal(os,40,data_);
 		}
 	}
 
@@ -258,7 +258,7 @@ public:
 		SizeType x0 = i*orbitals_+orb1;
 		SizeType x1 = i*orbitals_+orb2;
 		SizeType sum = getNbyKet(ket,x0,x1);
-		return (sum & 1) ? ProgramGlobals::FERMION_SIGN : 1;
+		return (sum & 1) ? LanczosGlobals::FERMION_SIGN : 1;
 	}
 
 private:
@@ -363,7 +363,7 @@ private:
 		while (orAll(remA)) {
 			for (SizeType orb=0; orb<kets.size(); orb++) {
 				SizeType bitA = (remA[orb] & 1);
-				if (bitA) ket |=ProgramGlobals::bitmask(counter);
+				if (bitA) ket |=LanczosGlobals::bitmask(counter);
 				counter++;
 				if (remA[orb]) remA[orb] >>= 1;
 			}
@@ -389,7 +389,7 @@ private:
 				SizeType mask = (1<<orb);
 				SizeType bitA = (ket & mask);
 
-				if (bitA) kets[orb] |= ProgramGlobals::bitmask(counter);
+				if (bitA) kets[orb] |= LanczosGlobals::bitmask(counter);
 			}
 			counter++;
 			ket >>= orbitals_;
@@ -402,17 +402,17 @@ private:
 	                      SizeType i) const
 	{
 
-		WordType si=(ket & ProgramGlobals::bitmask(i));
+		WordType si=(ket & LanczosGlobals::bitmask(i));
 		if (lOperator.id() == LabeledOperatorType::Label::OPERATOR_C) {
 			if (si>0) {
-				bra = (ket ^ ProgramGlobals::bitmask(i));
+				bra = (ket ^ LanczosGlobals::bitmask(i));
 				return true;
 			} else {
 				return false; // cannot destroy, there's nothing
 			}
 		} else if (lOperator.id() == LabeledOperatorType::Label::OPERATOR_CDAGGER) {
 			if (si==0) {
-				bra = (ket ^ ProgramGlobals::bitmask(i));
+				bra = (ket ^ LanczosGlobals::bitmask(i));
 				return true;
 			} else {
 				return false; // cannot construct, there's already one
@@ -432,7 +432,7 @@ private:
 		SizeType sum = 0;
 		SizeType counter = from;
 		while (counter<upto) {
-			if (ket & ProgramGlobals::bitmask(counter)) sum++;
+			if (ket & LanczosGlobals::bitmask(counter)) sum++;
 			counter++;
 		}
 

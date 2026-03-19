@@ -1,92 +1,83 @@
 /*
-*/
+ */
 
 #ifndef HUBBARDRASHBASOC_H
 #define HUBBARDRASHBASOC_H
 
-#include "BasisRashbaSOC.h"
-#include "BitManip.h"
-#include "TypeToString.h"
-#include "SparseRow.h"
-#include "../HubbardOneOrbital/ParametersModelHubbard.h"
-#include "ProgramGlobals.h"
 #include "../../Engine/ModelBase.h"
 #include "../HubbardOneOrbital/HubbardHelper.h"
+#include "../HubbardOneOrbital/ParametersModelHubbard.h"
+#include "BasisRashbaSOC.h"
+#include "BitManip.h"
+#include "LanczosGlobals.h"
+#include "SparseRow.h"
+#include "TypeToString.h"
 
 namespace LanczosPlusPlus {
 
-template<typename ComplexOrRealType,typename GeometryType,typename InputType>
-class HubbardOneOrbitalRashbaSOC : public ModelBase<ComplexOrRealType,GeometryType,InputType> {
+template <typename ComplexOrRealType, typename GeometryType, typename InputType>
+class HubbardOneOrbitalRashbaSOC : public ModelBase<ComplexOrRealType, GeometryType, InputType> {
 
 public:
 
-	typedef typename PsimagLite::Real<ComplexOrRealType>::Type RealType;
-	typedef PsimagLite::Matrix<ComplexOrRealType> MatrixType;
-	typedef ModelBase<ComplexOrRealType,GeometryType,InputType> BaseType;
-	typedef ParametersModelHubbard<RealType,InputType> ParametersModelType;
-	typedef BasisRashbaSOC<GeometryType> BasisType;
-	typedef typename BasisType::PairIntType PairIntType;
-	typedef typename BasisType::BaseType BasisBaseType;
-	typedef typename BasisType::WordType WordType;
-	typedef typename BaseType::VectorSizeType VectorSizeType;
-	typedef typename BaseType::SparseMatrixType SparseMatrixType;
-	typedef typename BaseType::VectorType VectorType;
-	typedef typename BasisType::LabeledOperatorType LabeledOperatorType;
-	typedef PsimagLite::SparseRow<SparseMatrixType> SparseRowType;
+	typedef typename PsimagLite::Real<ComplexOrRealType>::Type      RealType;
+	typedef PsimagLite::Matrix<ComplexOrRealType>                   MatrixType;
+	typedef ModelBase<ComplexOrRealType, GeometryType, InputType>   BaseType;
+	typedef ParametersModelHubbard<RealType, InputType>             ParametersModelType;
+	typedef BasisRashbaSOC<GeometryType>                            BasisType;
+	typedef typename BasisType::PairIntType                         PairIntType;
+	typedef typename BasisType::BaseType                            BasisBaseType;
+	typedef typename BasisType::WordType                            WordType;
+	typedef typename BaseType::VectorSizeType                       VectorSizeType;
+	typedef typename BaseType::SparseMatrixType                     SparseMatrixType;
+	typedef typename BaseType::VectorType                           VectorType;
+	typedef typename BasisType::LabeledOperatorType                 LabeledOperatorType;
+	typedef PsimagLite::SparseRow<SparseMatrixType>                 SparseRowType;
 	typedef HubbardHelper<BaseType, BasisType, ParametersModelType> HubbardHelperType;
-	typedef typename HubbardHelperType::VectorRahulOperatorType VectorRahulOperatorType;
+	typedef typename HubbardHelperType::VectorRahulOperatorType     VectorRahulOperatorType;
 
-	static int const FERMION_SIGN = BasisType::FERMION_SIGN;
+	static int const FERMION_SIGN = BasisType::BasisType::FERMION_SIGN;
 
-	enum class TermEnum {HOPPING, RASHBA_SOC};
-
-	HubbardOneOrbitalRashbaSOC(SizeType ne,
-	                           InputType& io,
-	                           const GeometryType& geometry)
-	    : mp_(io),
-	      geometry_(geometry),
-	      basis_(geometry, ne),
-	      helper_(geometry, mp_)
-	{}
-
-	~HubbardOneOrbitalRashbaSOC()
+	enum class TermEnum
 	{
-		BaseType::deleteGarbage(garbage_);
-	}
+		HOPPING,
+		RASHBA_SOC
+	};
+
+	HubbardOneOrbitalRashbaSOC(SizeType ne, InputType& io, const GeometryType& geometry)
+	    : mp_(io)
+	    , geometry_(geometry)
+	    , basis_(geometry, ne)
+	    , helper_(geometry, mp_)
+	{ }
+
+	~HubbardOneOrbitalRashbaSOC() { BaseType::deleteGarbage(garbage_); }
 
 	SizeType size() const { return basis_.size(); }
 
-	SizeType orbitals(SizeType) const
-	{
-		return 1;
-	}
+	SizeType orbitals(SizeType) const { return 1; }
 
-	void setupHamiltonian(SparseMatrixType& matrix) const
-	{
-		setupHamiltonian(matrix, basis_);
-	}
+	void setupHamiltonian(SparseMatrixType& matrix) const { setupHamiltonian(matrix, basis_); }
 
 	//! Gf. related functions below:
-	void setupHamiltonian(SparseMatrixType& matrix,
-	                      const BasisBaseType& basis) const
+	void setupHamiltonian(SparseMatrixType& matrix, const BasisBaseType& basis) const
 	{
 		return helper_.setupHamiltonian(matrix, basis);
 	}
 
-	void matrixVectorProduct(VectorType &x,VectorType const &y) const
+	void matrixVectorProduct(VectorType& x, VectorType const& y) const
 	{
-		matrixVectorProduct(x,y,basis_);
+		matrixVectorProduct(x, y, basis_);
 	}
 
-	void matrixVectorProduct(VectorType &x,
-	                         VectorType const &y,
-	                         const BasisBaseType& basis) const
+	void
+	matrixVectorProduct(VectorType& x, VectorType const& y, const BasisBaseType& basis) const
 	{
 		helper_.matrixVectorProduct(x, y, basis);
 	}
 
-	bool hasNewParts(std::pair<SizeType,SizeType>&,
-	                 const std::pair<SizeType,SizeType>&,
+	bool hasNewParts(std::pair<SizeType, SizeType>&,
+	                 const std::pair<SizeType, SizeType>&,
 	                 const LabeledOperator&,
 	                 SizeType,
 	                 SizeType) const
@@ -107,29 +98,28 @@ public:
 		return ptr;
 	}
 
-	void print(std::ostream& os) const { os<<mp_; }
+	void print(std::ostream& os) const { os << mp_; }
 
 	void printOperators(std::ostream& os) const
 	{
-		os<<"WARNING: printOperators unimplemented\n";
+		os << "WARNING: printOperators unimplemented\n";
 	}
 
-	void rahulMethod(VectorType& psiNew,
+	void rahulMethod(VectorType&                    psiNew,
 	                 const VectorRahulOperatorType& vops,
-	                 const VectorSizeType& vsites,
-	                 const VectorType& psi) const
+	                 const VectorSizeType&          vsites,
+	                 const VectorType&              psi) const
 	{
 		return helper_.rahulMethod(psiNew, vops, vsites, psi, basis_);
 	}
 
 private:
 
-	const ParametersModelType mp_;
-	const GeometryType& geometry_;
-	BasisType basis_;
-	HubbardHelperType helper_;
+	const ParametersModelType                             mp_;
+	const GeometryType&                                   geometry_;
+	BasisType                                             basis_;
+	HubbardHelperType                                     helper_;
 	mutable typename PsimagLite::Vector<BasisType*>::Type garbage_;
 }; // class HubbardOneOrbitalRashbaSOC
 } // namespace LanczosPlusPlus
 #endif
-

@@ -5,7 +5,7 @@
 #define LANCZOS_BASIS_KITAEV_H
 
 #include "BitManip.h"
-#include "ProgramGlobals.h"
+#include "LanczosGlobals.h"
 #include "../../Engine/BasisBase.h"
 
 namespace LanczosPlusPlus {
@@ -19,7 +19,7 @@ public:
 	static const SizeType TWICE_THE_SPIN = 1;
 	static const SizeType BITS = 1;
 
-	typedef ProgramGlobals::PairIntType PairIntType;
+	typedef LanczosGlobals::PairIntType PairIntType;
 	typedef BasisBase<GeometryType> BaseType;
 	typedef typename BaseType::WordType WordType;
 	typedef typename BaseType::VectorWordType VectorWordType;
@@ -30,7 +30,7 @@ public:
 	{
 		SizeType sites = geometry_.numberOfSites();
 		hilbert_ <<= sites;
-		ProgramGlobals::doBitmask(sites);
+		LanczosGlobals::doBitmask(sites);
 	}
 
 	PairIntType parts() const
@@ -40,7 +40,7 @@ public:
 
 	static const WordType& bitmask(SizeType i)
 	{
-		return ProgramGlobals::bitmask(i);
+		return LanczosGlobals::bitmask(i);
 	}
 
 	SizeType size() const { return hilbert_; }
@@ -126,8 +126,8 @@ public:
 		if (TWICE_THE_SPIN != 1)
 			throw PsimagLite::RuntimeError("BasisKitaev::getBraIndex_ \n");
 
-//		if (operatorLabel == ProgramGlobals::OPERATOR_SPLUS ||
-//		        operatorLabel == ProgramGlobals::OPERATOR_SMINUS) {
+//		if (operatorLabel == LanczosGlobals::OPERATOR_SPLUS ||
+//		        operatorLabel == LanczosGlobals::OPERATOR_SMINUS) {
 //			return getBraIndexSplusSminus(ket1,ket2,operatorLabel,site,spin,orb);
 //		}
 
@@ -143,9 +143,9 @@ public:
 		SizeType hilbert = 1;
 		hilbert <<= geometry_.numberOfSites();
 		if (binaryOrDecimal == BaseType::PRINT_BINARY) {
-			ProgramGlobals::printBasisBinary(os, hilbert, hilbert_);
+			LanczosGlobals::printBasisBinary(os, hilbert, hilbert_);
 		} else {
-			ProgramGlobals::printBasisDecimal(os, 40, hilbert_);
+			LanczosGlobals::printBasisDecimal(os, 40, hilbert_);
 		}
 	}
 
@@ -190,7 +190,7 @@ private:
 	{
 		SizeType mask = 1;
 		for (SizeType i = 0; i < BITS; ++i)
-			mask |= ProgramGlobals::bitmask(i);
+			mask |= LanczosGlobals::bitmask(i);
 		return mask;
 	}
 
