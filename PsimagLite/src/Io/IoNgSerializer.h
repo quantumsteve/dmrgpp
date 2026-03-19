@@ -433,7 +433,11 @@ public:
 	    = 0)
 	{
 		void*       ptr     = static_cast<void*>(&value);
-		H5::DataSet dataset = hdf5file_->openDataSet("Def/" + name);
+		H5::DataSet dataset = [this, &name]()
+		{
+			HDF5DisableExceptionPrinting disable;
+			return hdf5file_->openDataSet("Def/" + name);
+		}();
 		dataset.read(ptr, typeToH5<SomeType>());
 	}
 
@@ -718,18 +722,21 @@ private:
 	void writeCanary()
 	{
 		hsize_t dims[1];
-		dims[0]                         = 1;
-		static const String   name      = "/Def/Canary";
+		dims[0]                    = 1;
+		const String          name = "/Def/Canary";
 		H5::DataSpace         dataspace(1, dims); // create new dspace
 		H5::DSetCreatPropList dsCreatPlist; // What properties here? FIXME
-		H5::DataSet           dataset;
 
-		try {
-			dataset = hdf5file_->openDataSet(name);
-		} catch (H5::Exception&) {
-			dataset = hdf5file_->createDataSet(
-			    name, typeToH5<unsigned char>(), dataspace, dsCreatPlist);
-		}
+		H5::DataSet dataset = [this, &name, &dataspace, &dsCreatPlist]()
+		{
+			try {
+				HDF5DisableExceptionPrinting disable;
+				return hdf5file_->openDataSet(name);
+			} catch (H5::Exception&) {
+				return hdf5file_->createDataSet(
+				    name, typeToH5<unsigned char>(), dataspace, dsCreatPlist);
+			}
+		}();
 
 		unsigned char c = CANARY_VALUE;
 		dataset.write(&c, typeToH5<unsigned char>());
