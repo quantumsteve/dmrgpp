@@ -119,7 +119,7 @@ public:
 		groupName = "Def/" + groupName;
 		try {
 			HDF5DisableExceptionPrinting disable;
-			H5::Group group = hdf5file_->openGroup(groupName);
+			H5::Group                    group = hdf5file_->openGroup(groupName);
 			group.close();
 		} catch (...) {
 			return false;
@@ -438,9 +438,9 @@ public:
 	void read(bool& value, String name)
 	{
 		unsigned char tmp[1];
-		tmp[0]               = 0;
-		void*        ptr     = static_cast<void*>(tmp);
-		H5::DataSet  dataset = hdf5file_->openDataSet("Def/" + name);
+		tmp[0]              = 0;
+		void*       ptr     = static_cast<void*>(tmp);
+		H5::DataSet dataset = hdf5file_->openDataSet("Def/" + name);
 		dataset.read(ptr, typeToH5<unsigned char>());
 		value = (tmp[0] & 1);
 	}
@@ -627,9 +627,9 @@ private:
 	{
 		using UnderlyingType = typename Real<typename SomeVectorType::value_type>::Type;
 
-		H5::DataSet          dataset = hdf5file_->openDataSet("Def/" + name);
-		const H5::DataSpace  dspace  = dataset.getSpace();
-		const int            ndims  = dspace.getSimpleExtentNdims();
+		H5::DataSet         dataset = hdf5file_->openDataSet("Def/" + name);
+		const H5::DataSpace dspace  = dataset.getSpace();
+		const int           ndims   = dspace.getSimpleExtentNdims();
 		if (ndims != 1)
 			throw RuntimeError("IoNgSerializer: problem reading "
 			                   "vector ndims != 1\n");
@@ -893,8 +893,8 @@ private:
 	std::unique_ptr<H5::H5File> hdf5file_;
 	String                      filename_;
 	unsigned int                mode_;
-	static const SizeType booleanEncodedSize_  = 4;
-	static const SizeType booleanEncodedStart_ = 4;
+	static const SizeType       booleanEncodedSize_  = 4;
+	static const SizeType       booleanEncodedStart_ = 4;
 };
 } // namespace PsimagLite
 #endif // IONGSERIALIZER_H
