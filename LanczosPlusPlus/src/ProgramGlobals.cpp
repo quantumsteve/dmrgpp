@@ -1,7 +1,9 @@
+#include "ProgramGlobals.h"
 #include "Engine/ProgramGlobals.h"
 
 namespace LanczosPlusPlus {
 
-	PsimagLite::Vector<ProgramGlobals::WordType>::Type ProgramGlobals::bitmask_;
-	int ProgramGlobals::FERMION_SIGN = -1;
+PsimagLite::Vector<LanczosGlobals::WordType>::Type LanczosGlobals::bitmask_;
+int                                                LanczosGlobals::FERMION_SIGN = -1;
+
 }

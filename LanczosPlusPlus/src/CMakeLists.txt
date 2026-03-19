@@ -1,32 +1,17 @@
-cmake_minimum_required(VERSION 3.4)
-project (LanczosPlusPlus)
-
-cmake_policy(SET CMP0056 NEW)
-cmake_policy(SET CMP0065 NEW)
-cmake_policy(SET CMP0042 NEW)
-
-message(${PsimagLite_SOURCE_DIR})
-
-include_directories(${PsimagLite_SOURCE_DIR}
-  ${PsimagLite_SOURCE_DIR}/../
-  Engine
-  )
-
 add_executable (lanczos lanczos.cpp)
+target_include_directories (lanczos PRIVATE
+${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/Engine ${CMAKE_CURRENT_SOURCE_DIR}/Model)
+target_link_libraries (lanczos PUBLIC psimaglite::psimaglite psimaglite)
+
 add_executable (thermal thermal.cpp)
+target_include_directories (thermal PRIVATE
+${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/Engine)
+target_link_libraries (thermal psimaglite::psimaglite)
+
 add_executable (lorentzian lorentzian.cpp)
 
-target_link_libraries (lanczos
-  PsimagLite
-  ${ADDITIONAL_LIBRARIES}
-  )
 
-target_link_libraries (thermal
-  PsimagLite
-  ${ADDITIONAL_LIBRARIES}
-  )
 
 target_link_libraries (lorentzian
-  PsimagLite
-  ${ADDITIONAL_LIBRARIES}
+  psimaglite::psimaglite
   )
