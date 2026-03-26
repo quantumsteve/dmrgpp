@@ -373,17 +373,18 @@ private:
 		return 1;
 	}
 
-	static ComplexOrRealType geometryFactor(const std::string& factor,
-	                                        const RealType&    time,
-	                                        const std::vector<SizeType>&,
-	                                        const typename InputNgType::Readable& io)
+	ComplexOrRealType geometryFactor(const std::string& factor,
+	                                 const RealType&    time,
+	                                 const std::vector<SizeType>&,
+	                                 const typename InputNgType::Readable& io) const
 	{
 		if (factor.empty())
 			return 1.0;
 
-		std::string str = factor;
+		SizeType    number_of_sites = hamAbstract_.superGeometry().numberOfSites();
+		std::string str             = factor;
 		PsimagLite::replaceAll(str, "%t", ttos(time));
-		// TODO FIXME replace also number of sites here
+		PsimagLite::replaceAll(str, "%n", ttos(number_of_sites));
 
 		std::vector<std::string> ve;
 		PsimagLite::split(ve, str, ":");

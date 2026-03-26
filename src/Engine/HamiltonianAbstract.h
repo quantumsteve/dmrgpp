@@ -55,7 +55,6 @@ public:
 	{
 		ComplexOrRealType value
 		    = superGeometry_(smax_, emin_, hItems, oneLink.orbs, termIndexForGeom);
-		// SizeType site = findSite(hItems);
 		oneLink.modifier(value, targetTime, hItems);
 		return value;
 	}
