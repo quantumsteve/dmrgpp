@@ -186,6 +186,10 @@ add_lowest_eigenvalue_check_test(output6020 -2.59474 runForinput6020.cout)
 add_test(NAME input6700 COMMAND ./dmrg -f ${PATH_TO_INPUTS}/input6700.ain) # energy -4.17889 we don't check this
 add_test(NAME input8900 COMMAND ./dmrg -f ${PATH_TO_INPUTS}/input8900.ain "<gs|sz_p|gs>") # none
 add_test(NAME input8901 COMMAND ./dmrg -f ${PATH_TO_INPUTS}/input8901.ain "<gs|sz|gs>") # none
+add_test(NAME input9000 COMMAND ./dmrg -f ${PATH_TO_INPUTS}/input9000.ain) # energy -0.472136
+add_test(NAME input9001 COMMAND ./dmrg -f ${PATH_TO_INPUTS}/input9001.ain "<P0|n|P0>"
+)# in-situ 1 (1.010966,0.000000) 0.500000 <P0|n|P0> (1.000000,0.000000)
+
 # Tests for the observe executable
 add_test(NAME observe0002 COMMAND ./observe -l "+r" -f ${PATH_TO_INPUTS}/input2.ain
                                   "<gs|c';c|gs>,<gs|2.0*sz;2.0*sz|gs>,<gs|n;n|gs>")
