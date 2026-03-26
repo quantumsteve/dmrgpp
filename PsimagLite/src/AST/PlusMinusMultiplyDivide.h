@@ -53,8 +53,11 @@ public:
 		NodeType* times = new TimesType();
 		nodes_.push_back(times);
 
-		NodeType* dividedBy = new DividedByType();
-		nodes_.push_back(dividedBy);
+		NodeType* dividedByF = new DividedByType(DividedByType::FLOATING_POINT);
+		nodes_.push_back(dividedByF);
+
+		NodeType* dividedByI = new DividedByType(DividedByType::INTEGER);
+		nodes_.push_back(dividedByI);
 
 		NodeType* modulus = new ModulusType();
 		nodes_.push_back(modulus);

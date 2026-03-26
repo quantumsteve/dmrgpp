@@ -17,6 +17,7 @@ Please see full open source license included in file LICENSE.
 #ifndef PSI_NODE_H
 #define PSI_NODE_H
 #include "../Vector.h"
+#include "TypeToString.h"
 #include <cassert>
 
 namespace PsimagLite {
@@ -113,7 +114,11 @@ public:
 
 	virtual ValueType exec(const VectorValueType& v) const
 	{
-		assert(v.size() == 2);
+		if (v.size() != 2) {
+			throw RuntimeError("Expected two arguments for operator *, but found "
+			                   + ttos(v.size()) + "\n");
+		}
+
 		return v[0] * v[1];
 	}
 
@@ -125,9 +130,19 @@ template <typename VectorValueType> class DividedBy : public Node<VectorValueTyp
 
 public:
 
+	enum Kind
+	{
+		FLOATING_POINT,
+		INTEGER
+	};
+
+	DividedBy(Kind kind)
+	    : kind_(kind)
+	{ }
+
 	DividedBy* clone() const { return new DividedBy(*this); }
 
-	virtual PsimagLite::String code() const { return "/"; }
+	virtual PsimagLite::String code() const { return (kind_ == FLOATING_POINT) ? "/" : "i/"; }
 
 	virtual SizeType arity() const { return 2; }
 
@@ -135,10 +150,26 @@ public:
 	{
 		assert(v.size() == 2);
 		if (std::norm(v[1]) < 1e-6)
-			return v[0];
+			return byKind(v[0], 1.);
 
-		return v[0] / v[1];
+		return byKind(v[0], v[1]);
 	}
+
+private:
+
+	ValueType byKind(const ValueType& num, const ValueType& denom) const
+	{
+		return (kind_ == FLOATING_POINT) ? num / denom : toInteger(num, denom);
+	}
+
+	static ValueType toInteger(const ValueType& num, const ValueType& denom)
+	{
+		assert(std::real(denom) != 0);
+		int ret = std::real(num) / std::real(denom);
+		return ret;
+	}
+
+	Kind kind_;
 
 }; // class DividedBy
 
