@@ -60,7 +60,6 @@ target_link_libraries(psimaglite PUBLIC BLAS::BLAS)
 target_link_libraries(psimaglite PUBLIC LAPACK::LAPACK)
 
 find_package(GSL REQUIRED)
-target_compile_definitions(psimaglite PUBLIC USE_GSL)
 target_link_libraries(psimaglite PUBLIC GSL::gsl)
 
 if(BUILD_SHARED_LIBS)

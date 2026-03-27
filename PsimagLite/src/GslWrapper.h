@@ -79,130 +79,15 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #ifndef GSL_WRAPPER_H_
 #define GSL_WRAPPER_H_
 
-#ifdef USE_GSL
+#include "Vector.h"
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_sf_expint.h>
 #include <gsl/gsl_sf_gamma.h>
 #include <gsl/gsl_sf_result.h>
-#endif
-
-#include "Vector.h"
 #include <stdexcept>
 
 namespace PsimagLite {
-
-#ifndef USE_GSL
-class GslWrapper {
-public:
-
-	using DummyType                 = int;
-	using gsl_integration_workspace = DummyType;
-	typedef double (*GslWrapperFunctionType)(double, void*);
-	typedef struct {
-		double val;
-		double err;
-	} gsl_sf_result;
-
-	using gsl_error_handler_t = std::function<int(const char*, const char*, int)>;
-
-	struct gsl_function {
-		GslWrapperFunctionType function;
-		void*                  params;
-	};
-
-	gsl_error_handler_t gsl_set_error_handler(gsl_error_handler_t) const
-	{
-		thereSnoGsl();
-		gsl_error_handler_t* fx = new gsl_error_handler_t();
-
-		return *fx;
-	}
-
-	gsl_integration_workspace* gsl_integration_workspace_alloc(SizeType) const
-	{
-		thereSnoGsl();
-		int* x = new int;
-		return x;
-	}
-
-	void gsl_integration_workspace_free(gsl_integration_workspace*) const { thereSnoGsl(); }
-
-	int gsl_integration_qag(const gsl_function*,
-	                        double,
-	                        double,
-	                        double,
-	                        double,
-	                        size_t,
-	                        int,
-	                        gsl_integration_workspace*,
-	                        double*,
-	                        double*) const
-	{
-		thereSnoGsl();
-		return 0;
-	}
-
-	int gsl_integration_qagiu(gsl_function*,
-	                          double,
-	                          double,
-	                          double,
-	                          size_t,
-	                          gsl_integration_workspace*,
-	                          double*,
-	                          double*) const
-	{
-		thereSnoGsl();
-		return 0;
-	}
-
-	int gsl_integration_qagp(const gsl_function*,
-	                         double*,
-	                         SizeType,
-	                         double,
-	                         double,
-	                         SizeType,
-	                         gsl_integration_workspace*,
-	                         double*,
-	                         double*) const
-	{
-		thereSnoGsl();
-		return 0;
-	}
-
-	int gsl_integration_qagi(gsl_function*,
-	                         double,
-	                         double,
-	                         size_t,
-	                         gsl_integration_workspace*,
-	                         double*,
-	                         double*) const
-	{
-		thereSnoGsl();
-		return 0;
-	}
-
-	void printError(int) const { thereSnoGsl(); }
-
-	int gsl_sf_lngamma_complex_e(double, double, gsl_sf_result*, gsl_sf_result*) const
-	{
-		thereSnoGsl();
-		return 0;
-	}
-
-	int gsl_sf_Ci_e(double, gsl_sf_result*)
-	{
-		thereSnoGsl();
-		return 0;
-	}
-
-private:
-
-	void thereSnoGsl() const { throw RuntimeError("You need to compile with the GSL\n"); }
-
-}; // class GslWrapper
-
-#else
 
 class GslWrapper {
 public:
@@ -293,9 +178,6 @@ public:
 	int gsl_sf_Ci_e(double x, gsl_sf_result* result) const { return ::gsl_sf_Ci_e(x, result); }
 
 }; // class GslWrapper
-
-#endif
-
 } // namespace PsimagLite
 
 /*@}*/
