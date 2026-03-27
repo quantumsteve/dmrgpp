@@ -87,12 +87,10 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include "Matrix.h"
 #include <complex>
 
-#ifdef USE_GSL
 extern "C"
 {
 #include <gsl/gsl_poly.h>
 }
-#endif
 
 namespace PsimagLite {
 
@@ -160,13 +158,9 @@ public:
 			aa[j] = -d_[p - 1 - j];
 		}
 
-#ifdef USE_GSL
 		gsl_poly_complex_workspace* w = gsl_poly_complex_workspace_alloc(pp1);
 		gsl_poly_complex_solve(&aa[0], pp1, w, &zz[0]);
 		gsl_poly_complex_workspace_free(w);
-#else
-		throw RuntimeError("Please compile with USE_GSL defined\n");
-#endif
 
 		for (SizeType j = 0; j < p; j++) {
 			roots[j] = Complex(zz[2 * j], zz[2 * j + 1]);

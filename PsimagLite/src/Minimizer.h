@@ -9,7 +9,6 @@
 #include <iostream>
 #include <stdexcept>
 
-#ifdef USE_GSL
 extern "C"
 {
 #include <gsl/gsl_multimin.h>
@@ -248,52 +247,4 @@ private:
 
 }; // class Minimizer
 } // namespace PsimagLite
-
-#else
-
-namespace PsimagLite {
-
-template <typename RealType, typename FunctionType> class Minimizer {
-
-	using FieldType  = typename FunctionType::FieldType;
-	using VectorType = typename Vector<FieldType>::Type;
-
-public:
-
-	enum
-	{
-		GSL_SUCCESS  = 0,
-		GSL_CONTINUE = 1
-	};
-
-	Minimizer(FunctionType&, SizeType, bool = false)
-	{
-		String str("Minimizer needs the gsl\n");
-		throw RuntimeError(str);
-	}
-
-	int simplex(VectorType&, RealType = 1e-3, RealType = 1e-3)
-	{
-		String str("Minimizer needs the gsl\n");
-		throw RuntimeError(str);
-	}
-
-	int conjugateGradient(VectorType&,
-	                      RealType = 1e-3,
-	                      RealType = 1e-3,
-	                      RealType = 1e-3,
-	                      SizeType = 0)
-	{
-		String str("Minimizer needs the gsl\n");
-		throw RuntimeError(str);
-	}
-
-	int status() const { return 1; }
-
-	String statusString() const { return "Minimizer needs the gsl"; }
-};
-
-} // namespace PsimagLite
-#endif
-
 #endif // MINIMIZER_H
