@@ -6,18 +6,6 @@ Infrastructure and tests
 
 * full pipeline cmake tests, and few with catch2 [MR 66, MR 105, MR 72]
 
-* Kron tests run automatically [MR 88]
-
-* Only one main branch: master (features deleted) [MR 53]
-
-* .cmake-format, .clang-format enforce indentation rules [MR 52]
-
-* Github automatic ci on push
-
-* Merge rules (must have approval, must pass ci)
-
-* Old ci system (with ci.pl) now obsolete
-
 * GSL, HDF5, BLAS, LAPACK now required [MR 84, MR 91]
 
 * pthreads enabled by default
@@ -48,37 +36,17 @@ New features
 
 * Arnoldi and Arnoldi-SAI [MR 65]
 
-Refactoring
-
-* typedef --> using [MR 101]
-
-* Rename Mpi.h -> NotMpi.h
-
-* Geometry and SuperGeometry classes interface changes
-
-* Some relative path removal [MR 134]
-
 Improvements
 
 * checks against computing multipoints in-situ
 
-* Signals support removed [MR 113]
-
-* PTHREAD_ASSIGN_AFFINITIES deleted [MR 135]
-
-* More Ainur labels now predefined
-
 * No longer needs bogus operators in non-ground-state [MR 122]
-
-* Remove outdated testQn.cpp test [MR 144]
 
 observe driver
 
 * observe can now measure partial sweeps
 
 * four-points accepted now in any order
-
-* added cmake tests
 
 Models
 
@@ -90,8 +58,6 @@ Models
 Documentation
 
 * SVD in DMRG++ added doc/SvdInDmrgpp.tex
-
-* Improve build instructions [MR 60]
 
 Scripts
 
@@ -107,13 +73,10 @@ PsimagLite
 
 * drivers directory renamed to examples
 
-* added cmake tests and some catch2 tests
-
 Cincuenta
 
 * Cincuenta and all its git history merged into DMRG++
 
-* added cmake tests
 
 2023-08-08 Version 6.06
 
