@@ -13,9 +13,15 @@ target_sources(dmrgpp PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/GitRevision.h)
 target_include_directories(dmrgpp PUBLIC ${CMAKE_CURRENT_BINARY_DIR} Engine)
 target_link_libraries(dmrgpp PUBLIC psimaglite::psimaglite)
 
+# DMRG runner
+add_library(dmrgRunner Engine/DmrgRunner.cpp)
+target_include_directories(dmrgRunner PUBLIC ${CMAKE_CURRENT_BINARY_DIR} .. ../src/Engine ../PsimagLite/src
+                                             ../PsimagLite)
+target_link_libraries(dmrgRunner PUBLIC dmrgpp)
+
 # Dmrg executable (main executable)
 add_executable(dmrg ${instantiationFileList} dmrg.cpp)
-target_link_libraries(dmrg dmrgpp kronutil)
+target_link_libraries(dmrg dmrgpp dmrgRunner kronutil)
 target_include_directories(dmrg PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Observe executable
@@ -28,11 +34,11 @@ target_link_libraries(toolboxdmrg dmrgpp)
 
 # Many omegas executable
 add_executable(omegas manyOmegas.cpp)
-target_link_libraries(omegas dmrgpp kronutil)
+target_link_libraries(omegas dmrgpp dmrgRunner kronutil)
 
 # Introspect executable
 add_executable(introspect introspect.cpp)
-target_link_libraries(introspect dmrgpp kronutil)
+target_link_libraries(introspect dmrgpp dmrgRunner kronutil)
 
 if(BUILD_SHARED_LIBS)
   install(TARGETS dmrgpp LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})

@@ -103,11 +103,6 @@ to the main dmrg driver are the following.
 		return 1;
 	}
 
-	if (cmdline_options.logfile.empty()) {
-		throw std::runtime_error("operator does not support -l logfile. "
-		                         "Did you mean -e?\n");
-	}
-
 	cmdline_options.in_situ_measurements = (optind < argc) ? argv[optind] : "";
 
 	if (cmdline_options.logfile == "?") { // query only
