@@ -132,7 +132,7 @@ Threads=number
 int main(int argc, char** argv)
 {
 	using namespace Dmrg;
-	PsimagLite::PsiApp application("observe", &argc, &argv, 1);
+	PsimagLite::PsiApp application("DMRG++::observe", &argc, &argv, 1);
 	std::string        filename;
 	std::string        filesOption;
 	std::string        output_filename;

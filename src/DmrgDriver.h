@@ -44,13 +44,11 @@ struct OperatorOptions {
 	OperatorOptions()
 	    : site(0)
 	    , introspect(IntrospectEnum::EXPRESSION)
-	    , enabled(false)
 	{ }
 
 	SizeType           site;
 	PsimagLite::String opexpr;
 	IntrospectEnum     introspect;
-	bool               enabled;
 };
 
 template <typename ModelBaseType>
@@ -61,14 +59,14 @@ void operatorDriver(const ModelBaseType& model, const OperatorOptions& obsOption
 	using OperatorType     = typename OperatorsType::OperatorType;
 	using OperatorSpecType = Dmrg::OperatorSpec<ModelBaseType, OperatorType>;
 
-	OperatorType       opC;
-	const OperatorType opEmpty;
-	OperatorSpecType   opSpec(model);
-	int                site = -1;
+	OperatorType                                      opC;
+	const OperatorType                                opEmpty;
+	OperatorSpecType                                  opSpec(model);
+	int                                               site = -1;
+	PsimagLite::CanonicalExpression<OperatorSpecType> canonicalExpression(opSpec);
 
 	switch (obsOptions.introspect) {
 	case OperatorOptions::IntrospectEnum::EXPRESSION:
-		PsimagLite::CanonicalExpression<OperatorSpecType> canonicalExpression(opSpec);
 		canonicalExpression(opC, obsOptions.opexpr, opEmpty, site);
 		opC.write(std::cout);
 		break;
@@ -78,6 +76,8 @@ void operatorDriver(const ModelBaseType& model, const OperatorOptions& obsOption
 	case OperatorOptions::IntrospectEnum::MODEL_HAMILTONIAN:
 		model.printTerms();
 		break;
+	default:
+		throw std::runtime_error("InternalError: operatorDriver\n");
 	}
 }
 #endif // DMRGDRIVER_H

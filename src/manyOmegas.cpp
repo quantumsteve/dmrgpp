@@ -13,7 +13,7 @@ void usage(const PsimagLite::String& name)
 
 int main(int argc, char** argv)
 {
-	PsimagLite::PsiApp application("manyOmegas", &argc, &argv, 1);
+	PsimagLite::PsiApp application("DMRG++::manyOmegas", &argc, &argv, 1);
 
 	int                  opt         = 0;
 	bool                 versionOnly = false;

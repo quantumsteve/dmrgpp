@@ -1,5 +1,6 @@
 #ifndef DMRGRUNNER_H
 #define DMRGRUNNER_H
+#include "../DmrgDriver.h"
 #include "BasisWithOperators.h"
 #include "CmdLineOptions.hh"
 #include "CrsMatrix.h"
@@ -36,50 +37,55 @@ public:
 
 	void doOneRun(const PsimagLite::String& data, const CmdLineOptions& cmd_line) const
 	{
+		OperatorOptions op_options;
+		this->doOneRun(data, cmd_line, op_options);
+	}
+
+	void doOneRun(const PsimagLite::String& data,
+	              const CmdLineOptions&     cmd_line,
+	              const OperatorOptions&    op_options) const
+	{
 		InputCheck             inputCheck;
 		InputNgType::Writeable ioWriteable(inputCheck, data);
 		InputNgType::Readable  io(ioWriteable);
 
 		ParametersDmrgSolverType dmrgSolverParams(io, cmd_line.solver_options);
 
-		adjustDmrgSolverParams(dmrgSolverParams,
-		                       cmd_line.in_situ_measurements,
-		                       cmd_line.precision,
-		                       cmd_line.number_of_threads);
+		bool introspect_only = (dmrgSolverParams.options.isSet("introspect"));
 
-		if (endDueToClobber(dmrgSolverParams.options.isSet("noClobber"),
-		                    cmd_line.logfile)) {
-			return;
+		std::string insitu   = cmd_line.in_situ_measurements;
+		SizeType    nthreads = cmd_line.number_of_threads;
+		if (introspect_only) {
+			insitu   = "";
+			nthreads = 1;
 		}
 
-		dealWithConsoleOutput(
-		    dmrgSolverParams, cmd_line.logfile, cmd_line.unbuffered_output);
+		adjustDmrgSolverParams(dmrgSolverParams, insitu, cmd_line.precision, nthreads);
 
-		constexpr bool PRINT_HEADER = true;
-		application_.base64encode(std::cout, data, PRINT_HEADER);
+		if (!introspect_only) {
+			if (endDueToClobber(dmrgSolverParams.options.isSet("noClobber"),
+			                    cmd_line.logfile)) {
+				return;
+			}
 
-		application_.printCmdLine(std::cout);
+			dealWithConsoleOutput(
+			    dmrgSolverParams, cmd_line.logfile, cmd_line.unbuffered_output);
 
-		setCorrectThreading(dmrgSolverParams, io);
+			constexpr bool PRINT_HEADER = true;
+			application_.base64encode(std::cout, data, PRINT_HEADER);
+
+			application_.printCmdLine(std::cout);
+
+			setCorrectThreading(dmrgSolverParams, io);
+		}
 
 		bool isComplex = (dmrgSolverParams.options.isSet("useComplex")
 		                  || dmrgSolverParams.options.isSet("TimeStepTargeting"));
 
 		if (isComplex)
-			doOneRun2<std::complex<RealType>>(dmrgSolverParams, io);
+			doOneRun2<std::complex<RealType>>(dmrgSolverParams, op_options, io);
 		else
-			doOneRun2<RealType>(dmrgSolverParams, io);
-	}
-
-	void printOutputChange(PsimagLite::String logfile, PsimagLite::String data) const
-	{
-		std::cerr << Provenance::logo(application_.name());
-		std::cerr << "Standard output sent to ";
-		std::cerr << logfile << "\n";
-		std::cerr.flush();
-
-		application_.printCmdLine(std::cout);
-		application_.base64encode(std::cout, data, true);
+			doOneRun2<RealType>(dmrgSolverParams, op_options, io);
 	}
 
 	const ApplicationType& application() const { return application_; }
@@ -88,6 +94,7 @@ private:
 
 	template <typename ComplexOrRealType>
 	void doOneRun2(const ParametersDmrgSolverType& dmrgSolverParams,
+	               const OperatorOptions&          op_options,
 	               InputNgType::Readable&          io) const
 	{
 		using SuperGeometryType
@@ -104,29 +111,36 @@ private:
 		                                         SuperGeometryType>;
 
 		if (dmrgSolverParams.options.isSet("MatrixVectorStored")) {
-			doOneRun3<MatrixVectorStored<ModelBaseType>>(dmrgSolverParams, io);
+			doOneRun3<MatrixVectorStored<ModelBaseType>>(
+			    dmrgSolverParams, op_options, io);
 		} else if (dmrgSolverParams.options.isSet("MatrixVectorOnTheFly")) {
-			doOneRun3<MatrixVectorOnTheFly<ModelBaseType>>(dmrgSolverParams, io);
+			doOneRun3<MatrixVectorOnTheFly<ModelBaseType>>(
+			    dmrgSolverParams, op_options, io);
 		} else {
-			doOneRun3<MatrixVectorKron<ModelBaseType>>(dmrgSolverParams, io);
+			doOneRun3<MatrixVectorKron<ModelBaseType>>(
+			    dmrgSolverParams, op_options, io);
 		}
 	}
 
 	template <typename MatrixVectorType>
 	void doOneRun3(const ParametersDmrgSolverType& dmrgSolverParams,
+	               const OperatorOptions&          op_options,
 	               InputNgType::Readable&          io) const
 	{
 		using ComplexOrRealType = typename MatrixVectorType::ComplexOrRealType;
 		if (dmrgSolverParams.options.isSet("vectorwithoffsets")) {
 			typedef VectorWithOffsets<ComplexOrRealType, Qn> VectorWithOffsetType;
-			doOneRun4<MatrixVectorType, VectorWithOffsetType>(dmrgSolverParams, io);
+			doOneRun4<MatrixVectorType, VectorWithOffsetType>(
+			    dmrgSolverParams, op_options, io);
 		} else {
 			typedef VectorWithOffset<ComplexOrRealType, Qn> VectorWithOffsetType;
-			doOneRun4<MatrixVectorType, VectorWithOffsetType>(dmrgSolverParams, io);
+			doOneRun4<MatrixVectorType, VectorWithOffsetType>(
+			    dmrgSolverParams, op_options, io);
 		}
 	}
 	template <typename MatrixVectorType, typename VectorWithOffsetType>
 	void doOneRun4(const ParametersDmrgSolverType& dmrgSolverParams,
+	               const OperatorOptions&          op_options,
 	               InputNgType::Readable&          io) const
 	{
 		using ComplexOrRealType = typename MatrixVectorType::ComplexOrRealType;
@@ -143,6 +157,11 @@ private:
 		//! Setup the Model
 		ModelSelector<ModelBaseType> modelSelector(dmrgSolverParams.model);
 		ModelBaseType&               model = modelSelector(dmrgSolverParams, io, geometry);
+
+		if (dmrgSolverParams.options.isSet("instrospect")) {
+			operatorDriver(model, op_options);
+			return; // <<<---- EARLY EXIT HERE
+		}
 
 		//! Setup the dmrg solver
 		using DmrgSolverType = DmrgSolver<SolverType, VectorWithOffsetType>;
