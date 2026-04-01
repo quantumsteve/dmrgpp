@@ -16,6 +16,10 @@ Core, Integration.
 https://www.ornl.gov/staff-profile/peter-w-doak
 cmake, repo imports
 
+- Steven Hahn
+https://www.ornl.gov/staff-profile/steven-e-hahn
+hdf5 wrangling
+
 - Jacek Herbrych
 url here
 DMRG++: Models
@@ -27,6 +31,10 @@ DMRG++: Spin-orbit coupling models
 - Pontus Laurell
 url here
 DMRG++: Kitaev models
+
+- Damien Lebrun-Grandie
+https://www.ornl.gov/staff-profile/damien-t-lebrun-grandie
+cmake, modernization, CI
 
 - Maksymilian Środa (Max)
 url here
