@@ -12,6 +12,14 @@ See file LICENSE for details.
 https://g1257.github.io/
 Core, Integration.
 
+- Peter W. Doak
+https://www.ornl.gov/staff-profile/peter-w-doak
+cmake, repo imports
+
+- Steven Hahn
+https://www.ornl.gov/staff-profile/steven-e-hahn
+hdf5 wrangling
+
 - Jacek Herbrych
 url here
 DMRG++: Models
@@ -24,9 +32,14 @@ DMRG++: Spin-orbit coupling models
 url here
 DMRG++: Kitaev models
 
+- Damien Lebrun-Grandie
+https://www.ornl.gov/staff-profile/damien-t-lebrun-grandie
+cmake, modernization, CI
+
 - Maksymilian Środa (Max)
 url here
 DMRG++: Tests, bug fixes
+
 
 
 * Past Contributors
@@ -54,8 +67,6 @@ PsimagLite: LanczosSolver
 
 - Luis G. Dias Da Silva
 
-- Peter Doak
-
 - Anibal Lugo
 
 - Eduardo Ponce
@@ -69,4 +80,3 @@ PsimagLite: LanczosSolver
 # - Name
 # url line
 # description line
-
