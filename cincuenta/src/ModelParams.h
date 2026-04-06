@@ -7,6 +7,19 @@
 
 namespace Dmft {
 
+//---------------------------------------------------------------------------//
+/*!
+ * \brief ModelParams
+ * The ModelParams class "emerged" to solve the following problem:
+ * We have to do a minimization that depends on both hoppings and
+ * potentialV, so it's a function like f(hoppings, potentialV).
+ * The minimizer is general though and takes a function of a vector like
+ * f(vector). That explains why we have at some point a single vector that
+ * combines both hoppings followed by potentialV.
+ * Somewhere we have to convert
+ * from one_vector (bathParams) --> two vectors (hoppings, and potentialV).
+ * The ModelParams class ctor is where I do this right now.
+ */
 template <typename ComplexOrRealType> struct ModelParams {
 
 	using RealType       = typename PsimagLite::Real<ComplexOrRealType>::Type;
@@ -14,6 +27,22 @@ template <typename ComplexOrRealType> struct ModelParams {
 	using InputNgType    = PsimagLite::InputNg<Dmrg::InputCheck>;
 	using StarType       = PsimagLite::Star<ComplexOrRealType, InputNgType::Readable>;
 
+	//---------------------------------------------------------------------------//
+	/*!
+	 * \brief Constructor
+	 *
+	 * The constructed hoppings have bath elements, whereas the potentialV have
+	 * bath + 1 element to account for the impurity or center, which ends up
+	 * with potential zero here.
+	 *
+	 * \param[in] bathParams The bath parameters: hopping followed by potentialV.
+	 *                       This vector contains 2*bath numbers: first the
+	 *                       bath hoppings from each bath site to the center of
+	 *                       the star (impurity site), followed by bath
+	 *                       on-site energies, one for each bath site.
+	 *
+	 * \param[in/out] io     The input file readable object
+	 */
 	ModelParams(const VectorRealType& bathParams, InputNgType::Readable& io)
 	{
 		io.readline(nsites_, "TotalNumberOfSites=");
