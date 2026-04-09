@@ -41,9 +41,5 @@ endif()
 add_subdirectory(PsimagLite)
 add_subdirectory(src)
 
-add_subdirectory(cincuenta)
-# add_subdirectory(doc)
-
-# Treat LanczosPlusPlus like a subproject that can build on its own so
-# start with its CMakeLists.txt start in its root directory.
+add_subdirectory(cincuenta/src)
 add_subdirectory(LanczosPlusPlus/src)
