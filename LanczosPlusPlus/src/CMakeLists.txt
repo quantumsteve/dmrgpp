@@ -24,3 +24,5 @@ target_link_libraries(thermal psimaglite::psimaglite)
 add_executable(lorentzian lorentzian.cpp)
 
 target_link_libraries(lorentzian psimaglite::psimaglite)
+
+install(TARGETS lanczos thermal lorentzian RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
