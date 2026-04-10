@@ -12,4 +12,4 @@ install(TARGETS cincuenta freeGimp RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 # tests below
 set(PATH_TO_INPUTS ${CMAKE_CURRENT_SOURCE_DIR}/../TestSuite/inputs)
 
-add_test(NAME cincuenta0 COMMAND ./cincuenta -f ${PATH_TO_INPUTS}/inputCincuenta0.ain) # energy 0.456977
+add_test(NAME cincuenta0 COMMAND ./cincuenta -I ${PATH_TO_INPUTS} -f inputCincuenta0.ain) # energy 0.456977
