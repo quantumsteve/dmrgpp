@@ -23,6 +23,10 @@ int main(int argc, char* argv[])
 		}
 	}
 
+	if (filename.empty()) {
+		throw std::runtime_error("File must be provided\n");
+	}
+
 	std::string result = input_path.findFirst(filename);
 	std::cout << result << "\n";
 }

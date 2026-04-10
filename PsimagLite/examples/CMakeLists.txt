@@ -187,4 +187,4 @@ add_test(NAME threads COMMAND threads 1 4)
 
 add_executable(input_path inputPath.cpp)
 target_link_libraries(input_path psimaglite)
-add_test(NAME input_path COMMAND ./inputPath "inputPath")
+add_test(NAME input_path COMMAND ./inputPath -I ${CMAKE_SOURCE_DIR} -f "dmrg.cpp")
