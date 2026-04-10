@@ -184,3 +184,7 @@ add_test(NAME test_redirect_output COMMAND test_redirect_output)
 add_executable(threads threads.cpp)
 target_link_libraries(threads psimaglite)
 add_test(NAME threads COMMAND threads 1 4)
+
+add_executable(input_path inputPath.cpp)
+target_link_libraries(input_path psimaglite)
+add_test(NAME input_path COMMAND ./inputPath "inputPath")
