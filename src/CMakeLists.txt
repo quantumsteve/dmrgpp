@@ -16,7 +16,7 @@ target_link_libraries(dmrgpp_utils PUBLIC psimaglite::psimaglite)
 # DMRG runner
 add_library(dmrg_runner Engine/DmrgRunner.cpp)
 target_include_directories(dmrg_runner PUBLIC ${CMAKE_CURRENT_BINARY_DIR} .. ../src/Engine)
-target_link_libraries(dmrg_runner PUBLIC dmrgpp_utils psimaglite::psimaglite)
+target_link_libraries(dmrg_runner PUBLIC dmrgpp_utils psimaglite::psimaglite kronutil)
 
 # Dmrg executable (main executable)
 add_executable(dmrg ${instantiationFileList} dmrg.cpp)
