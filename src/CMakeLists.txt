@@ -28,7 +28,7 @@ add_executable(observe observe.cpp ObserveDriver0.cpp ObserveDriver1.cpp Observe
 target_link_libraries(observe dmrgpp_utils kronutil)
 
 # Toolbox executable
-add_executable(toolboxdmrg toolboxdmrg.cpp Qn.cpp ProgramGlobals.cpp Provenance.cpp)
+add_executable(toolboxdmrg toolboxdmrg.cpp)
 target_link_libraries(toolboxdmrg dmrgpp_utils)
 
 # Many omegas executable
