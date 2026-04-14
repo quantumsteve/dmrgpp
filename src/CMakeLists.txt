@@ -53,8 +53,12 @@ function(add_lowest_eigenvalue_check_test name expected output_file)
   set(options SHOULD_FAIL)
   set(one_value_args TOLERANCE)
   set(multivalue_args)
-  set(tolerance "2e-05")
   cmake_parse_arguments(PARSE "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+
+  set(tolerance "2e-05")
+  if(PARSE_TOLERANCE)
+    set(tolerance "${PARSE_TOLERANCE}")
+  endif()
 
   add_test(NAME ${name} COMMAND $<TARGET_FILE:check_value> "Found lowest eigenvalue=\\s+([.0-9eE+-]+)" "${expected}"
                                 "${tolerance}" ${CMAKE_CURRENT_BINARY_DIR}/${output_file})
