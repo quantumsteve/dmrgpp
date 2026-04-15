@@ -1,6 +1,7 @@
 #include "CincuentaInputCheck.h"
 #include "Dispersion.h"
 #include "DmftSolver.h"
+#include "InputPath.hpp"
 #include "ProgramGlobals.h"
 #include "Provenance.h"
 #include "PsimagLite.h"
@@ -25,49 +26,49 @@ void usage(const std::string& name)
 	std::cerr << "USAGE is " << name << " -f filename [-p precision] [-V]\n";
 }
 
-int main(int argc, char** argv)
-{
-	PsimagLite::PsiApp application("dmft", &argc, &argv, 1);
-	using InputNgType = PsimagLite::InputNg<Dmft::CincuentaInputCheck>;
-	typedef
-#ifndef USE_FLOAT
-	    double
-#else
-	    float
-#endif
-	        RealType;
-	using DmftSolverType       = Dmft::DmftSolver<std::complex<RealType>>;
-	using ParamsDmftSolverType = DmftSolverType::ParamsDmftSolverType;
-	int         opt            = 0;
-	bool        versionOnly    = false;
-	std::string inputfile;
-	std::string logfile;
-	SizeType    precision  = 12;
-	bool        unbuffered = false;
-	/* PSIDOC DmrgDriver
+/* PSIDOC DmrgDriver
 There is a single input file that is passed as the
 argument to \verb!-f!, like so
 \begin{lstlisting}
-	./dmrg -f input.inp [options]
+./dmrg -f input.inp [options]
 \end{lstlisting}
 The command line arguments
 to the main dmrg driver are the following.
-	  \begin{itemize}
-	  \item[-f] {[}Mandatory, String{]} Input to use.
-	  \item[-p] [Optional, Integer] Digits of precision for printing.
-	  \item[-l] {[}Optional, String{]} Without this option std::cout is redirected
-	  to a file.
-	  This option with the string ``?'' prints name of such log file.
-	  This option with the string ``-'' writes std::cout to terminal.
-	  In other cases, string is the name of the file to redirect std::cout to.
-	 \item[-U] [Optional] Make cout output unbuffered
-	 \item[-V] [Optional] Print version and exit
-	  \end{itemize}
-	 */
-	while ((opt = getopt(argc, argv, "f:p:l:U:V")) != -1) {
+  \begin{itemize}
+  \item[-f] {[}Mandatory, String{]} Input to use.
+  \item[-I] {Optional, String} Add an input path to the search; it can be used multiple times
+  \item[-p] [Optional, Integer] Digits of precision for printing.
+  \item[-l] {[}Optional, String{]} Without this option std::cout is redirected
+  to a file.
+  This option with the string ``?'' prints name of such log file.
+  This option with the string ``-'' writes std::cout to terminal.
+  In other cases, string is the name of the file to redirect std::cout to.
+ \item[-U] [Optional] Make cout output unbuffered
+ \item[-V] [Optional] Print version and exit
+  \end{itemize}
+ */
+int main(int argc, char** argv)
+{
+	PsimagLite::PsiApp application("dmft", &argc, &argv, 1);
+	using InputNgType                 = PsimagLite::InputNg<Dmft::CincuentaInputCheck>;
+	using RealType                    = double;
+	using DmftSolverType              = Dmft::DmftSolver<std::complex<RealType>>;
+	using ParamsDmftSolverType        = DmftSolverType::ParamsDmftSolverType;
+	int                   opt         = 0;
+	bool                  versionOnly = false;
+	std::string           inputfile;
+	std::string           logfile;
+	SizeType              precision  = 12;
+	bool                  unbuffered = false;
+	PsimagLite::InputPath input_path;
+
+	while ((opt = getopt(argc, argv, "f:p:l:U:I:V")) != -1) {
 		switch (opt) {
 		case 'f':
 			inputfile = optarg;
+			break;
+		case 'I':
+			input_path.push(optarg);
 			break;
 		case 'p':
 			precision = atoi(optarg);
@@ -151,14 +152,21 @@ to the main dmrg driver are the following.
 		application.echoBase64(std::cout, inputfile);
 
 	Dmft::CincuentaInputCheck inputCheck;
-	InputNgType::Writeable    ioWriteable(inputfile, inputCheck);
+	InputNgType::Writeable    ioWriteable(input_path.findFirst(inputfile), inputCheck);
 	InputNgType::Readable     io(ioWriteable);
 
 	ParamsDmftSolverType params(io);
-	if (precision > 0)
+	// BEGIN adjust params
+	if (precision > 0) {
 		params.precision = precision;
+	}
+
 	params.echoInput = echoInput;
 
+	params.gsTemplate    = input_path.findFirst(params.gsTemplate);
+	params.omegaTemplate = input_path.findFirst(params.omegaTemplate);
+
+	// END adjust params
 	DmftSolverType::FitType::InitResults initResults(io);
 
 	DmftSolverType dmftSolver(params, initResults, application);
