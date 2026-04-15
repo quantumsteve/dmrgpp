@@ -78,6 +78,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #define HAMILTONIAN_CONNECTION_H
 
 #include "Concurrency.h"
+#include "CookInputExpression.hh"
 #include "CrsMatrix.h"
 #include "HamiltonianAbstract.h"
 #include "ManyToTwoConnection.h"
@@ -122,15 +123,17 @@ public:
 	using SuperOpHelperBaseType   = SuperOpHelperBase<SuperGeometryType, ParamsForSolverType>;
 	using ManyToTwoConnectionType
 	    = ManyToTwoConnection<ModelLinksType, LeftRightSuperType, SuperOpHelperBaseType>;
-	using OpsForLinkType = OpsForLink<LeftRightSuperType>;
+	using OpsForLinkType          = OpsForLink<LeftRightSuperType>;
+	using CookInputExpressionType = CookInputExpression<ComplexOrRealType>;
+	using InputNgType             = typename CookInputExpressionType::InputNgType;
 
-	HamiltonianConnection(const LeftRightSuperType&    lrs,
-	                      const ModelLinksType&        lpb,
-	                      RealType                     targetTime,
-	                      const SuperOpHelperBaseType& superOpHelper)
+	HamiltonianConnection(const LeftRightSuperType&       lrs,
+	                      const ModelLinksType&           lpb,
+	                      RealType                        time,
+	                      const SuperOpHelperBaseType&    superOpHelper,
+	                      typename InputNgType::Readable& io)
 	    : modelHelper_(lrs)
 	    , modelLinks_(lpb)
-	    , targetTime_(targetTime)
 	    , superOpHelper_(superOpHelper)
 	    , operatorsCached_(lrs)
 	    , progress_("HamiltonianConnection")
@@ -149,7 +152,7 @@ public:
 		lps_.reserve(ProgramGlobals::MAX_LPS);
 		SizeType nitems = hamAbstract_.items();
 		for (SizeType x = 0; x < nitems; ++x)
-			totalOnes_[x] = cacheConnections(x);
+			totalOnes_[x] = cacheConnections(x, time, io);
 
 		SizeType last = lrs.super().block().size();
 		assert(last > 0);
@@ -268,7 +271,8 @@ public:
 
 private:
 
-	SizeType cacheConnections(SizeType x)
+	SizeType
+	cacheConnections(SizeType x, const RealType& time, typename InputNgType::Readable& io)
 	{
 		const VectorSizeType& hItems = hamAbstract_.item(x);
 
@@ -282,6 +286,8 @@ private:
 
 		assert(type != ProgramGlobals::ConnectionEnum::SYSTEM_SYSTEM
 		       && type != ProgramGlobals::ConnectionEnum::ENVIRON_ENVIRON);
+
+		CookInputExpressionType cook_input_expression(io);
 
 		SizeType       totalOne      = 0;
 		const SizeType geometryTerms = modelLinks_.numberOfTerms();
@@ -299,11 +305,26 @@ private:
 
 				const OneLink<ComplexOrRealType>& oneLink = term(dofs);
 
-				ComplexOrRealType tmp = hamAbstract_.connectionValue(
-				    hItems, oneLink, termIndexForGeom, targetTime_);
+				ComplexOrRealType tmp1 = hamAbstract_.connectionValue(
+				    hItems, oneLink, termIndexForGeom, time);
 
-				if (tmp == static_cast<RealType>(0.0))
+				if (tmp1 == 0.0)
 					continue;
+
+				// Factor added in the input file for this geometry term
+				const std::string& geometry_factor = hamAbstract_.superGeometry()
+				                                         .geometry()
+				                                         .term(termIndex)
+				                                         .factor();
+
+				// default_value = 1.0, that is, if factor is not present
+				ComplexOrRealType tmp2
+				    = cook_input_expression(geometry_factor, 1.0, time);
+
+				if (tmp2 == 0.0)
+					continue;
+
+				ComplexOrRealType tmp = tmp1 * tmp2;
 
 				ManyToTwoConnectionType manyToTwo(hItems,
 				                                  type,
@@ -420,7 +441,6 @@ private:
 
 	const ModelHelperType         modelHelper_;
 	const ModelLinksType&         modelLinks_;
-	RealType                      targetTime_;
 	const SuperOpHelperBaseType&  superOpHelper_;
 	OperatorsCachedType           operatorsCached_;
 	PsimagLite::ProgressIndicator progress_;

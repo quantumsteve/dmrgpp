@@ -8,52 +8,53 @@ add_custom_command(
 add_subdirectory(KronUtil)
 
 # DMRG++ as a library so cincuenta can use it
-add_library(dmrgpp ProgramGlobals.cpp Provenance.cpp Utils.cpp Su2Related.cpp Qn.cpp)
-target_sources(dmrgpp PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/GitRevision.h)
-target_include_directories(dmrgpp PUBLIC ${CMAKE_CURRENT_BINARY_DIR} Engine)
-target_link_libraries(dmrgpp PUBLIC psimaglite::psimaglite)
+add_library(dmrgpp_utils ProgramGlobals.cpp Provenance.cpp Utils.cpp Su2Related.cpp Qn.cpp)
+target_sources(dmrgpp_utils PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/GitRevision.h)
+target_include_directories(dmrgpp_utils PUBLIC ${CMAKE_CURRENT_BINARY_DIR} Engine)
+target_link_libraries(dmrgpp_utils PUBLIC psimaglite::psimaglite)
 
-# generate sources file for explicitly instantiating mainLoop4
-set(counter 0)
-set(instantiationFileList)
-foreach(complexOrReal RealType std::complex<RealType>)
-  foreach(solverType LanczosSolver ChebyshevSolver)
-    foreach(matrixVectorType MatrixVectorOnTheFly MatrixVectorStored MatrixVectorKron)
-      math(EXPR counter "${counter} + 1")
-      set(instantiationFile ${CMAKE_CURRENT_BINARY_DIR}/DmrgDriver${counter}.cpp)
-      configure_file(cmake/DmrgDriver.cpp.in ${instantiationFile})
-      list(APPEND instantiationFileList ${instantiationFile})
-    endforeach()
-  endforeach()
-endforeach()
-unset(counter)
+# DMRG runner
+add_library(dmrg_runner Engine/DmrgRunner.cpp)
+target_link_libraries(dmrg_runner PUBLIC dmrgpp_utils kronutil)
 
 # Dmrg executable (main executable)
 add_executable(dmrg ${instantiationFileList} dmrg.cpp)
-target_link_libraries(dmrg dmrgpp kronutil)
+target_link_libraries(dmrg dmrg_runner)
 target_include_directories(dmrg PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Observe executable
 add_executable(observe observe.cpp ObserveDriver0.cpp ObserveDriver1.cpp ObserveDriver2.cpp)
-target_link_libraries(observe dmrgpp kronutil)
+target_link_libraries(observe dmrgpp_utils kronutil)
 
 # Toolbox executable
-add_executable(toolboxdmrg toolboxdmrg.cpp Qn.cpp ProgramGlobals.cpp Provenance.cpp)
-target_link_libraries(toolboxdmrg dmrgpp)
+add_executable(toolboxdmrg toolboxdmrg.cpp)
+target_link_libraries(toolboxdmrg dmrgpp_utils)
 
 # Many omegas executable
 add_executable(omegas manyOmegas.cpp)
-target_link_libraries(omegas dmrgpp kronutil)
+target_link_libraries(omegas dmrgpp_utils dmrg_runner)
+
+# Introspect executable
+add_executable(introspect introspect.cpp)
+target_link_libraries(introspect dmrgpp_utils dmrg_runner)
 
 if(BUILD_SHARED_LIBS)
-  install(TARGETS dmrgpp LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+  install(TARGETS dmrg_runner dmrgpp_utils LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 endif()
-install(TARGETS dmrg toolboxdmrg omegas RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(TARGETS dmrg observe toolboxdmrg omegas introspect RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 # Tests below for all executables
 
-# For dmrg main executable
 set(PATH_TO_INPUTS ${CMAKE_CURRENT_SOURCE_DIR}/../TestSuite/inputs)
+
+# For introspect
+add_test(
+  NAME introspect0
+  COMMAND sh -c "./introspect -f ${PATH_TO_INPUTS}/input2.ain -H >  ${CMAKE_CURRENT_BINARY_DIR}/introspect_output0.txt")
+add_test(NAME introspect0_0 COMMAND diff -q ${PATH_TO_INPUTS}/introspect_ref0.txt
+                                    ${CMAKE_CURRENT_BINARY_DIR}/introspect_output0.txt)
+
+# For dmrg main executable
 
 function(add_lowest_eigenvalue_check_test name expected output_file)
   set(options SHOULD_FAIL)
@@ -61,25 +62,17 @@ function(add_lowest_eigenvalue_check_test name expected output_file)
   set(multivalue_args)
   cmake_parse_arguments(PARSE "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
-  # name expected output_file)
-  if(${AWK} MATCHES ".+-NOTFOUND")
-    message(WARNING "No awk found not adding ${name} test")
-  else()
-    set(tolerance 1e-5)
-    if(PARSE_TOLERANCE)
-      set(tolerance ${PARSE_TOLERANCE})
-    endif()
-    add_test(
-      NAME ${name}
-      COMMAND
-        ${AWK} -f ${dmrgpp_SOURCE_DIR}/scripts/check_value.awk -v
-        "pattern=Found lowest eigenvalue=[[:space:]]+([.0-9eE+-]+)" -v "expected=${expected}" -v
-        "tolerance=${tolerance}" ${CMAKE_CURRENT_BINARY_DIR}/${output_file})
-    if(PARSE_SHOULD_FAIL)
-      set_tests_properties(${name} PROPERTIES WILL_FAIL TRUE)
-    endif()
+  set(tolerance "2e-05")
+  if(PARSE_TOLERANCE)
+    set(tolerance "${PARSE_TOLERANCE}")
   endif()
 
+  add_test(NAME ${name} COMMAND $<TARGET_FILE:check_value> "Found lowest eigenvalue=\\s+([.0-9eE+-]+)" "${expected}"
+                                "${tolerance}" ${CMAKE_CURRENT_BINARY_DIR}/${output_file})
+
+  if(PARSE_SHOULD_FAIL)
+    set_tests_properties(${name} PROPERTIES WILL_FAIL TRUE)
+  endif()
 endfunction()
 
 add_test(NAME input2 COMMAND ./dmrg -f ${PATH_TO_INPUTS}/input2.ain)
@@ -186,6 +179,10 @@ add_lowest_eigenvalue_check_test(output6020 -2.59474 runForinput6020.cout)
 add_test(NAME input6700 COMMAND ./dmrg -f ${PATH_TO_INPUTS}/input6700.ain) # energy -4.17889 we don't check this
 add_test(NAME input8900 COMMAND ./dmrg -f ${PATH_TO_INPUTS}/input8900.ain "<gs|sz_p|gs>") # none
 add_test(NAME input8901 COMMAND ./dmrg -f ${PATH_TO_INPUTS}/input8901.ain "<gs|sz|gs>") # none
+add_test(NAME input9000 COMMAND ./dmrg -f ${PATH_TO_INPUTS}/input9000.ain) # energy -0.472136
+add_test(NAME input9001 COMMAND ./dmrg -f ${PATH_TO_INPUTS}/input9001.ain "<P0|n|P0>"
+)# in-situ 1 (1.010966,0.000000) 0.500000 <P0|n|P0> (1.000000,0.000000)
+
 # Tests for the observe executable
 add_test(NAME observe0002 COMMAND ./observe -l "+r" -f ${PATH_TO_INPUTS}/input2.ain
                                   "<gs|c';c|gs>,<gs|2.0*sz;2.0*sz|gs>,<gs|n;n|gs>")

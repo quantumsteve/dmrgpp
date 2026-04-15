@@ -169,6 +169,10 @@ public:
 		String s;
 		io.readline(s, "GeometryKind=");
 
+		try {
+			io.readline(gFactor_, "GeometryFactor=");
+		} catch (std::exception&) { }
+
 		io.readline(gOptions_, "GeometryOptions=");
 		bool constantValues = (gOptions_.find("ConstantValues") != String::npos);
 
@@ -246,7 +250,7 @@ public:
 		ioSerializer.createGroup(label);
 		aux_.write(label + "/aux_", ioSerializer);
 		ioSerializer.write(label + "/orbitals_", orbitals_);
-		// geometryBase_->write(label + "/geometryBase_", ioSerializer);
+		ioSerializer.write(label + "/gFactor_", gFactor_);
 		ioSerializer.write(label + "/gOptions_", gOptions_);
 		ioSerializer.write(label + "/directions_", directions_);
 		cachedValues_.write(label + "/cachedValues_", ioSerializer);
@@ -411,7 +415,9 @@ public:
 		return geometryBase_->calcDir(i, j);
 	}
 
-	String options() const { return gOptions_; }
+	const std::string& options() const { return gOptions_; }
+
+	const std::string& factor() const { return gFactor_; }
 
 	friend std::ostream& operator<<(std::ostream& os, const GeometryTerm& gt)
 	{
@@ -478,6 +484,7 @@ private:
 	SizeType                                     orbitals_;
 	GeometryBaseType*                            geometryBase_;
 	String                                       gOptions_;
+	std::string                                  gFactor_;
 	typename Vector<GeometryDirectionType>::Type directions_;
 	Matrix<ComplexOrRealType>                    cachedValues_;
 }; // class GeometryTerm
