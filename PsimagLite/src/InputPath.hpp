@@ -26,7 +26,8 @@ public:
 
 	std::string findFirst(const std::string& file) const
 	{
-		for (const auto& dir : paths_) {
+		for (auto rit = paths_.rbegin(); rit != paths_.rend(); ++rit) {
+			const std::string&    dir       = *rit;
 			std::string           test_file = (dir.empty()) ? file : dir + "/" + file;
 			std::filesystem::path path      = test_file;
 			if (std::filesystem::exists(path)) {
