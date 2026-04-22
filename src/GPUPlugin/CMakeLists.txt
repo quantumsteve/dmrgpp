@@ -22,3 +22,8 @@ target_compile_definitions(gpuplugin PUBLIC FpType=double)
 
 add_executable(test_vbatch test_vbatch.cpp)
 target_link_libraries(test_vbatch gpuplugin)
+add_test(NAME vbatch COMMAND test_vbatch)
+
+add_executable(test_gen_patches_comb test_gen_patches_comb.cpp)
+target_link_libraries(test_gen_patches_comb gpuplugin)
+add_test(NAME gen_patches_comb COMMAND test_gen_patches_comb)
