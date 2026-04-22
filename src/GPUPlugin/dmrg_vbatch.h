@@ -90,21 +90,18 @@ void dmrg_Xsetmatrix(const IntegerType m,
                      T*                dB_dst,
                      const IntegerType lddb);
 
-/*
-template<typename T>
-void apply_Htarget_vbatch(
-                                        IntegerType noperator,
-                                        IntegerType npatches,
-                                        IntegerType left_patch_start_[],
-                                        IntegerType right_patch_start_[],
-                                        IntegerType xy_patch_start_[],
-                                        T Abatch_[],
-                        IntegerType ld_Abatch,
-                                        T Bbatch_[],
-                        IntegerType ld_Bbatch,
-                                        T vin_[],
-                                        T vout_[]);
-*/
+template <typename T>
+void apply_Htarget_vbatch(SizeType       noperator,
+                          SizeType       npatches,
+                          VectorSizeType left_patch_start_,
+                          VectorSizeType right_patch_start_,
+                          VectorSizeType xy_patch_start_,
+                          std::vector<T> Abatch_,
+                          SizeType       ld_Abatch,
+                          std::vector<T> Bbatch_,
+                          SizeType       ld_Bbatch,
+                          T*             X_,
+                          T*             Y_);
 
 template <typename T>
 void apply_Htarget_sparse(SizeType                 noperator,

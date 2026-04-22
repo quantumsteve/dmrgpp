@@ -10,7 +10,6 @@ void apply_Htarget_sparse(IntegerType noperator,
                           IntegerType left_patch_start_[],
                           IntegerType right_patch_start_[],
                           IntegerType xy_patch_start_[],
-
                           IntegerType nC_[],
                           FpType*     gAbatch_[],
                           IntegerType ld_gAbatch_[],

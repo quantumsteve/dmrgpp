@@ -9,26 +9,26 @@
 #include <cassert>
 #include <vector>
 
-void apply_Htarget_vbatch(IntegerType noperator,
-                          IntegerType npatches,
-                          IntegerType left_patch_start_[],
-                          IntegerType right_patch_start_[],
-                          IntegerType xy_patch_start_[],
-                          FpType      Abatch_[],
-                          IntegerType ld_Abatch,
-                          FpType      Bbatch_[],
-                          IntegerType ld_Bbatch,
-                          FpType      X_[],
-                          FpType      Y_[])
+void apply_Htarget_vbatch(SizeType            noperator,
+                          SizeType            npatches,
+                          VectorSizeType      left_patch_start_,
+                          VectorSizeType      right_patch_start_,
+                          VectorSizeType      xy_patch_start_,
+                          std::vector<FpType> Abatch_,
+                          SizeType            ld_Abatch,
+                          std::vector<FpType> Bbatch_,
+                          SizeType            ld_Bbatch,
+                          FpType*             X_,
+                          FpType*             Y_)
 {
 	const IntegerType idebug = 1;
 	const IntegerType ialign = 32;
 	const double      giga   = 1000.0 * 1000.0 * 1000.0;
 
-	double gflops1         = (double)0.0;
-	double gflops2         = (double)0.0;
-	double time_1st_vbatch = (double)0.0;
-	double time_2nd_vbatch = (double)0.0;
+	double gflops1         = 0.0;
+	double gflops2         = 0.0;
+	double time_1st_vbatch = 0.0;
+	double time_2nd_vbatch = 0.0;
 
 	size_t nbytes_BX = 0;
 
@@ -37,21 +37,19 @@ void apply_Htarget_vbatch(IntegerType noperator,
 	 compute  Y = H * X
 	 ------------------
 	*/
-	IntegerType ipatch           = 0;
-	IntegerType jpatch           = 0;
 	IntegerType left_max_states  = left_patch_start_[npatches] - 1;
 	IntegerType right_max_states = right_patch_start_[npatches] - 1;
 
 	std::vector<IntegerType> left_patch_size_(npatches);
 	std::vector<IntegerType> right_patch_size_(npatches);
 
-	for (ipatch = 1; ipatch <= npatches; ipatch++) {
+	for (SizeType ipatch = 1; ipatch <= npatches; ipatch++) {
 		IntegerType L1 = left_patch_start_[ipatch - 1];
 		IntegerType L2 = left_patch_start_[ipatch] - 1;
 
 		left_patch_size_[ipatch - 1] = L2 - L1 + 1;
 	};
-	for (ipatch = 1; ipatch <= npatches; ipatch++) {
+	for (SizeType ipatch = 1; ipatch <= npatches; ipatch++) {
 		IntegerType R1                = right_patch_start_[ipatch - 1];
 		IntegerType R2                = right_patch_start_[ipatch] - 1;
 		right_patch_size_[ipatch - 1] = R2 - R1 + 1;
@@ -93,9 +91,8 @@ void apply_Htarget_vbatch(IntegerType noperator,
 	FpType* BX_ = new FpType[ld_BX * ncolA * noperator];
 	assert(BX_ != NULL);
 
-	ipatch          = 1;
 	IntegerType idx = 1;
-	for (jpatch = 1; jpatch <= npatches; jpatch++) {
+	for (SizeType jpatch = 1; jpatch <= npatches; jpatch++) {
 		IntegerType igroup = jpatch;
 		IntegerType j1     = xy_patch_start_[jpatch - 1];
 		IntegerType j2     = xy_patch_start_[jpatch] - 1;
@@ -192,7 +189,7 @@ void apply_Htarget_vbatch(IntegerType noperator,
 	 perform computations with  Y += (BX)*transpose(A)
 	 -------------------------------------------------
 	*/
-	for (ipatch = 1; ipatch <= npatches; ipatch++) {
+	for (SizeType ipatch = 1; ipatch <= npatches; ipatch++) {
 		IntegerType igroup = ipatch;
 
 		IntegerType i1 = xy_patch_start_[ipatch - 1];

@@ -33,6 +33,6 @@ void setup_sparse_batch(
     T***               pgBbatch,
     VectorIntegerType& pld_gBbatch);
 
-template <typename T> void unsetup_sparse_batch(T***, T***);
+template <typename T> void unsetup_sparse_batch(T*** gAbatch_, T*** gBbatch_);
 
 #endif
