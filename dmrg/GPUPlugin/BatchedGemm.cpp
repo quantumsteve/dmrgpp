@@ -78,7 +78,10 @@ template <typename T> BatchedGemm<T>::~BatchedGemm()
 	}
 }
 
-template <typename T> void BatchedGemm<T>::apply_Htarget(T* vin, T* vout)
+template <typename T>
+void BatchedGemm<T>::apply_Htarget(
+    Kokkos::View<const KokkosScalar*, Kokkos::HostSpace, Kokkos::MemoryUnmanaged> vin,
+    Kokkos::View<KokkosScalar*, Kokkos::HostSpace, Kokkos::MemoryUnmanaged>       vout)
 {
 	const bool use_sparse = true;
 	if (use_sparse) {

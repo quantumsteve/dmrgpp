@@ -228,8 +228,14 @@ void test_vbatch(SizeType noperator, IntegerType left_size, IntegerType max_keep
 		       (double)total_memory_in_nbytes / giga);
 	}
 
-	Kokkos::View<KokkosScalar*, Kokkos::SharedSpace> X_("X_", xy_size);
-	Kokkos::View<KokkosScalar*, Kokkos::SharedSpace> Y_("Y_", xy_size);
+	std::vector<KokkosScalar>                                               Xin_(xy_size);
+	std::vector<KokkosScalar>                                               Yout_(xy_size);
+	Kokkos::View<KokkosScalar*, Kokkos::HostSpace, Kokkos::MemoryUnmanaged> X_(Xin_.data(),
+	                                                                           Xin_.size());
+	Kokkos::View<const KokkosScalar*, Kokkos::HostSpace, Kokkos::MemoryUnmanaged> cX_(
+	    Xin_.data(), Xin_.size());
+	Kokkos::View<KokkosScalar*, Kokkos::HostSpace, Kokkos::MemoryUnmanaged> Y_(Yout_.data(),
+	                                                                           Yout_.size());
 
 	Kokkos::parallel_for(
 	    "test_vbatch", xy_size, KOKKOS_LAMBDA(const IntegerType i) {
@@ -252,8 +258,8 @@ void test_vbatch(SizeType noperator, IntegerType left_size, IntegerType max_keep
 				                     ld_pAbatch_,
 				                     pBbatch_,
 				                     ld_pBbatch_,
-				                     X_.data(),
-				                     Y_.data());
+				                     cX_,
+				                     Y_);
 			} else {
 				apply_Htarget_vbatch(noperator,
 				                     npatches,
@@ -264,8 +270,8 @@ void test_vbatch(SizeType noperator, IntegerType left_size, IntegerType max_keep
 				                     ld_Abatch,
 				                     Bbatch_,
 				                     ld_Bbatch,
-				                     X_.data(),
-				                     Y_.data());
+				                     cX_,
+				                     Y_);
 			}
 			ttime += dmrg_get_wtime();
 			printf("itimes=%d, time=%lf sec, gflops/sec=%lf\n",
@@ -317,15 +323,6 @@ void test_vbatch(SizeType noperator, IntegerType left_size, IntegerType max_keep
 
 	if (use_sparse) {
 		unsetup_sparse_batch(&pAbatch_, &pBbatch_);
-
-	} else {
-		/*unsetup_vbatch(
-		                left_patch_start_,
-		                right_patch_start_,
-		                xy_patch_start_,
-		                Abatch_,
-		                Bbatch_
-		              );*/
 	}
 }
 
