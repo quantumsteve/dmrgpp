@@ -22,8 +22,8 @@ list(APPEND CMAKE_MESSAGE_INDENT "[Kokkos] ")
 FetchContent_Declare(
   Kokkos
   GIT_REPOSITORY https://github.com/kokkos/kokkos
-  GIT_TAG 5.2.0
-  SYSTEM FIND_PACKAGE_ARGS 5.2 NAMES Kokkos)
+  GIT_TAG 5.1.1
+  SYSTEM FIND_PACKAGE_ARGS 5.1 NAMES Kokkos)
 FetchContent_MakeAvailable(Kokkos)
 list(POP_BACK CMAKE_MESSAGE_INDENT)
 
@@ -31,8 +31,8 @@ list(APPEND CMAKE_MESSAGE_INDENT "[KokkosKernels] ")
 FetchContent_Declare(
   KokkosKernels
   GIT_REPOSITORY https://github.com/kokkos/kokkos-kernels
-  GIT_TAG 5.2.0
-  SYSTEM FIND_PACKAGE_ARGS 5.2 NAMES KokkosKernels)
+  GIT_TAG 5.1.1
+  SYSTEM FIND_PACKAGE_ARGS 5.1 NAMES KokkosKernels)
 FetchContent_MakeAvailable(KokkosKernels)
 list(POP_BACK CMAKE_MESSAGE_INDENT)
 
